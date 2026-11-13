@@ -1,12 +1,13 @@
 <p align="center">
-  <img src="docs/images/icon.png" width="96" height="96" alt="RamPilot simgesi">
+  <img src="docs/images/icon.png" width="96" height="96" alt="RamPilot logosu: ok işaretli bir RAM yongası">
 </p>
 
 <h1 align="center">RamPilot</h1>
 
 <p align="center">
-  <b>Windows'ta boştaki arka plan uygulamaları için geri beslemeli bellek geri kazanımı.</b><br>
-  Ölçerek, kademeli ve geri alınabilir şekilde. RAM temizleyici değildir.
+  <b>Windows'ta arka planda boşta bekleyen uygulamaların RAM kullanımını düşürür.</b><br>
+  Discord, WhatsApp, Teams, Slack ve diğer Electron / WebView2 uygulamaları için kademeli, geri beslemeli çalışma kümesi sınırları.<br>
+  Ölçerek çalışır, geri alınabilir. RAM temizleyici değildir.
 </p>
 
 <p align="center">
@@ -20,7 +21,8 @@
 <p align="center">
   <a href="#nasıl-çalışır">Nasıl çalışır</a> ·
   <a href="#güvenlik-modeli">Güvenlik</a> ·
-  <a href="#hızlı-başlangıç">Hızlı başlangıç</a> ·
+  <a href="#kurulum-ve-hızlı-başlangıç">Kurulum</a> ·
+  <a href="#sss">SSS</a> ·
   <a href="docs/DESIGN.md">Tasarım</a> ·
   <a href="experiments/README.md">Deneyler</a> ·
   <a href="bench/README.md">Ölçüm yöntemi</a> ·
@@ -28,19 +30,47 @@
 </p>
 
 <p align="center">
-  <img src="docs/images/panel-dark-tr.png" width="820" alt="RamPilot kontrol paneli, koyu tema, Türkçe">
+  <img src="docs/images/panel-dark-tr.png" width="820" alt="Yönetilen uygulamaları (WhatsApp, Discord, Teams) özel bellek, sınır ve net kazançla listeleyen RamPilot kontrol paneli; tanıtım verisi">
   <br>
   <sub>Kontrol paneli, yerleşik tanıtım (demo) modunda. Bu görüntüdeki sayılar ölçüm değil, benzetimdir.</sub>
 </p>
 
+RamPilot, arka planda boşta bekleyen uygulamaların belleğini, RAM temizleyiciler gibi belleği topluca boşaltmak
+yerine kademeli ve geri beslemeli çalışma kümesi (working set) sınırlarıyla düşüren açık kaynaklı bir Windows
+aracıdır. Ücretsizdir ve bildirim alanında çalışır. İzin listesindeki bir uygulamanın boştaki her sürecine sert bir
+çalışma kümesi sınırı koyar, bu sınırı küçük adımlarla düşürür ve uygulama sayfaları geri istemeye başladığı anda
+yeniden yükseltir. Kullandığınız uygulama asla sınırlanmaz. RamPilot yönetici hakkı istemez, sürücü kurmaz, kod
+enjekte etmez ve hiçbir ağ bağlantısı kurmaz. Erken aşamadadır (0.1.0): mekanizma ölçüldü, ama günlük kullanımda ne
+kadar bellek kazandırdığını gösterecek karşılaştırmalı ölçüm henüz yapılmadı.
+
 > [!NOTE]
 > **Erken sürüm (0.1.0).** Denetleyici, benzetilmiş bir sürece karşı birim testleriyle sınandı. Dayandığı çekirdek
 > davranışı da yapay süreçlerle yapılan deneylerle ölçüldü ([deneyler](experiments/README.md)). Gerçek
-> uygulamalardaki kanıt, [Sonuçlar](#sonuçlar) bölümündeki canlı çalıştırmalarla sınırlı.
+> uygulamalardaki kanıt, [Şimdiye kadarki sonuçlar](#şimdiye-kadarki-sonuçlar) bölümündeki canlı çalıştırmalarla sınırlı.
 > [Karşılaştırmalı ölçüm](bench/README.md) tanımlandı ama henüz yapılmadı. Yalnızca Windows 11 derleme 26200
 > üzerinde denendi.
 
-## Neden
+## Kimler için
+
+RamPilot şu durumlarda işinize yarayabilir:
+
+- Discord, WhatsApp, Teams, Slack, ChatGPT, Notion ya da Spotify bütün gün açık duruyor ve siz kullanmazken her biri
+  birkaç yüz MB tutuyor.
+- 8–16 GB RAM'iniz var ve bu uygulamaları bir tarayıcı, oyun ya da derleme yanında çalıştırıyorsunuz.
+- Bir RAM temizleyici denediniz; boşalan bellek birkaç dakikada geri geldi, uygulamalar arasında geçerken de
+  takılma oldu.
+- Gerçekte ne kazanıldığını, sıkıştırma deposu maliyeti düşülmüş olarak görmek istiyorsunuz.
+
+Şu durumlarda işe yaramaz:
+
+- *Commit* belleğiniz tükeniyorsa (sayfa dosyası dolu, "yetersiz bellek" hataları). RamPilot yalnızca fiziksel
+  RAM'de tutulan belleği azaltır; commit değişmez.
+- Belleği önünüzdeki uygulama kullanıyorsa. Odaktaki uygulama asla sınırlanmaz.
+- Makinenizde bellek nadiren azalıyorsa. Orada Windows'un varsayılan davranışı yeterlidir.
+- Sistemdeki her süreci yönetmesini istiyorsanız. Yalnızca izin listesindeki uygulamaları yönetir, başka hiçbir şeyi
+  değil.
+
+## Boştaki uygulamalar neden bu kadar RAM tutuyor
 
 Electron ya da WebView2 üzerine kurulu sohbet ve asistan uygulamalarının (WhatsApp, Discord, ChatGPT, Slack, Teams)
 her biri kendi Chromium'unu taşır. Arka planda beklerken çalışma kümelerinin (working set) büyük kısmı soğuktur:
@@ -69,7 +99,7 @@ bedelini sayfa hatası olarak ödemeye başladığı anda da durur. Yaklaşım M
   </tr>
 </table>
 
-## RAM temizleyici değil
+## RamPilot bir RAM temizleyiciden nasıl ayrılır
 
 "RAM temizleyiciler" bir zamanlayıcıyla ya da düğmeyle `EmptyWorkingSet` çağırır. Bu, sıcak ve soğuk sayfaları
 birlikte atar. Uygulama sıcak sayfalarını hemen geri çeker. "Boşaltılan" sayı birkaç dakikada kaybolur, bedelini de
@@ -202,7 +232,7 @@ kaldırılmaz. Daha sığ derinlik sınırı yalnızca daha fazla inişi durduru
 >
 > Bu sonuçlar tek bir makineden geliyor. Arkalarındaki mekanizma da çıkarımdır; Microsoft bunu belgelemiyor.
 
-## Sonuçlar
+## Şimdiye kadarki sonuçlar
 
 <!-- RESULTS -->
 Aşağıdakilerin hepsi tek bir makinede (Intel Core Ultra 5 245KF, 16 GB DDR5, Windows 11 26200, bellek sıkıştırma
@@ -216,7 +246,7 @@ henüz **yapılmadı**; bu yüzden burada bilerek bir "şu kadar GB kazanıldı"
 | **Bir sayfanın geri istenmesi neye mal olur?** | Bekleme listesinden ~0,8&nbsp;µs, sıkıştırma deposundan ~1,65&nbsp;µs, diskten (dosya önbelleği) ~7&nbsp;µs. `HardFaultCount`, depodan yapılan 884.736 geri okumada 0'da kaldı; bu yüzden denetleyici yalnızca sert hataları değil tüm hataları bütçeler. | [prob B](experiments/README.md) |
 | **Canlı bir uygulamada denetleyici** | WhatsApp, 11&nbsp;dk: sınırlar çalışma kümesinin altından başlayıp her 30&nbsp;sn'de ×0,9 indi; bir geri istek patlaması sınırı tek adımda ×1,5 yükseltti ve bir taban koydu; etkinlik sonrası serbest bırakmanın ardından öğrenilmiş sınır (40,9&nbsp;MB) yeni bir yoklama olmadan geri geldi. | [tests/live](tests/live/evidence-2026-11-13.txt) |
 | **Kullandığınız uygulamaya dokunulmaz** | WhatsApp'ın aralıklarla kullanıldığı 20 dakikalık sürüm testi: hiç sınır konmadı, çünkü her odaklanma 5 dakikalık sayacı baştan başlattı. | motor ölçümleri, 2026-11-13 |
-| **Hiçbir sınır motordan uzun yaşamaz** | WhatsApp sınırlıyken motora iki kez `Stop-Process -Force`: bekçi 2 ve 3 sınırı 4–6&nbsp;ms içinde kaldırdı. Başka bir sürecin koyduğu sınırı açılış taraması temizledi. Her çalıştırmadan sonra 0 sınır kaldı. | [tests/live](tests/live/evidence-2026-11-13.txt) |
+| **Motor öldürülünce sınırlar kaldırılır** | WhatsApp sınırlıyken motora iki kez `Stop-Process -Force`: bekçi 2 ve 3 sınırı 4–6&nbsp;ms içinde kaldırdı. Başka bir sürecin koyduğu sınırı açılış taraması temizledi. Her çalıştırmadan sonra 0 sınır kaldı. | [tests/live](tests/live/evidence-2026-11-13.txt) |
 | **Motorun ayak izi** | Tek bir 3,6&nbsp;MB Native AOT exe, yaklaşık 10–13&nbsp;MB özel bellek, 2&nbsp;sn örnekleme. | motor tanılama |
 
 Henüz ölçülmedi: belleği sıkışık bir makinede saatler boyunca net kazanç, odak değiştirme gecikmesi ve hiç araç
@@ -228,14 +258,14 @@ bunun için var; olumsuz olanlar dahil sonuçlar orada yayınlanacak.
 
 | Koyu | Açık |
 |---|---|
-| ![RamPilot paneli, koyu tema, İngilizce](docs/images/panel-dark-en.png) | ![RamPilot paneli, açık tema, İngilizce](docs/images/panel-light-en.png) |
+| ![Koyu temada RamPilot kontrol paneli: uygulama başına bellek, sınırlar ve olay günlüğü (tanıtım verisi)](docs/images/panel-dark-en.png) | ![Açık temada RamPilot kontrol paneli: uygulama başına bellek, sınırlar ve olay günlüğü (tanıtım verisi)](docs/images/panel-light-en.png) |
 
 <details>
 <summary><b>Türkçe panel ve tepsi simgesi</b></summary>
 <br>
 
 <p align="center">
-  <img src="docs/images/panel-dark-tr.png" width="720" alt="RamPilot paneli, koyu tema, Türkçe">
+  <img src="docs/images/panel-dark-tr.png" width="720" alt="Türkçe RamPilot kontrol paneli, koyu tema: uygulama başına bellek, sınırlar ve olay günlüğü (tanıtım verisi)">
 </p>
 
 <p align="center">
@@ -246,32 +276,7 @@ bunun için var; olumsuz olanlar dahil sonuçlar orada yayınlanacak.
 
 Panel görüntüleri yerleşik tanıtım modundan alındı; değerleri benzetimdir.
 
-## Depo yapısı
-
-```text
-RamPilot/
-├── src/
-│   ├── RamPilot.Core/          Saf politika, P/Invoke ve G/Ç yok: Controller, Governor, Savings,
-│   │                           RoleClassifier, DenyList, EngineConfig, LearnedProfiles, ProcessSnapshot
-│   ├── RamPilot.Engine/        RamPilot.exe, Native AOT tepsi motoru
-│   │   ├── Win32/              ProcessSampler (NtQuerySystemInformation + öz denetim), ProcessHandle (sınırlar),
-│   │   │                       FocusTracker, AudioSessions (IAudioSessionManager2)
-│   │   ├── Safety/             Journal (her sınırdan önce yazılır), Guardian (bekçi + artık sınır taraması)
-│   │   ├── Ipc/                Protokol v2 adlandırılmış kanal sunucusu
-│   │   └── Engine.cs, Tray.cs  Ana döngü: ölç → karar ver → uygula → yayımla; tepsi simgesi (EN/TR)
-│   └── RamPilot.Panel/         RamPilot.Panel.exe: WinForms + WebView2 kabuğu; ui/ içinde HTML, CSS, JS, EN/TR metinleri
-├── tests/
-│   ├── RamPilot.Core.Tests/    Benzetilmiş bir sürece karşı denetleyici değişmezleri (sıcak küme, GC bölgesi, soğuk bellek)
-│   └── live/                   Canlı çalıştırma kanıtları, sahte hedef uygulama ve kanal istemcisi
-├── experiments/                Çekirdek deneyleri A/B/C, ilk faz 0/1 notları, ham CSV'ler
-├── bench/                      Ölçüm yöntemi ve PowerShell düzeneği (3 kol, bellek baskısı senaryosu, istatistik)
-├── docs/                       DESIGN.md, IPC.md, PRIVACY.md, görseller
-├── assets/                     Simge kaynakları (SVG, ICO, PNG)
-├── build.ps1                   Derleme, test ve artifacts\publish altına yayımlama
-└── Directory.Build.props       Ortak derleme ayarları: uyarılar hata sayılır, deterministik derleme
-```
-
-## Dürüst ölçüm
+## Kazanç nasıl ölçülür
 
 Çalışma kümesini kırpmayı olduğundan iyi göstermek kolaydır. Bu yüzden RamPilot üç sayı raporlar:
 
@@ -325,7 +330,7 @@ kararı "sınır yok" tarafına düşer.
 Tehdit modeli ve açık bildirimi: [`SECURITY.md`](SECURITY.md). Yerelde ne saklandığı:
 [`docs/PRIVACY.md`](docs/PRIVACY.md).
 
-## Hızlı başlangıç
+## Kurulum ve hızlı başlangıç
 
 ### Gereksinimler
 
@@ -418,46 +423,143 @@ Aynı klasörde `learned.json` (öğrenilmiş sınırlar ve tabanlar), `journal.
 anahtar ve aralığı [`src/RamPilot.Core/EngineConfig.cs`](src/RamPilot.Core/EngineConfig.cs) ve
 [`docs/DESIGN.md`](docs/DESIGN.md) içinde belgelenmiştir.
 
+## Depo yapısı
+
+```text
+RamPilot/
+├── src/
+│   ├── RamPilot.Core/          Saf politika, P/Invoke ve G/Ç yok: Controller, Governor, Savings,
+│   │                           RoleClassifier, DenyList, EngineConfig, LearnedProfiles, ProcessSnapshot
+│   ├── RamPilot.Engine/        RamPilot.exe, Native AOT tepsi motoru
+│   │   ├── Win32/              ProcessSampler (NtQuerySystemInformation + öz denetim), ProcessHandle (sınırlar),
+│   │   │                       FocusTracker, AudioSessions (IAudioSessionManager2)
+│   │   ├── Safety/             Journal (her sınırdan önce yazılır), Guardian (bekçi + artık sınır taraması)
+│   │   ├── Ipc/                Protokol v2 adlandırılmış kanal sunucusu
+│   │   └── Engine.cs, Tray.cs  Ana döngü: ölç → karar ver → uygula → yayımla; tepsi simgesi (EN/TR)
+│   └── RamPilot.Panel/         RamPilot.Panel.exe: WinForms + WebView2 kabuğu; ui/ içinde HTML, CSS, JS, EN/TR metinleri
+├── tests/
+│   ├── RamPilot.Core.Tests/    Benzetilmiş bir sürece karşı denetleyici değişmezleri (sıcak küme, GC bölgesi, soğuk bellek)
+│   └── live/                   Canlı çalıştırma kanıtları, sahte hedef uygulama ve kanal istemcisi
+├── experiments/                Çekirdek deneyleri A/B/C, ilk faz 0/1 notları, ham CSV'ler
+├── bench/                      Ölçüm yöntemi ve PowerShell düzeneği (3 kol, bellek baskısı senaryosu, istatistik)
+├── docs/                       DESIGN.md, IPC.md, PRIVACY.md, görseller
+├── assets/                     Simge kaynakları (SVG, ICO, PNG)
+├── build.ps1                   Derleme, test ve artifacts\publish altına yayımlama
+└── Directory.Build.props       Ortak derleme ayarları: uyarılar hata sayılır, deterministik derleme
+```
+
 ## SSS
 
-**Oyunlar ve hile önleyicilerle güvenli mi?**
-Oyunlar, oyun başlatıcıları, hile önleyiciler ve güvenlik yazılımları programa derlenmiş bir engel listesinde.
-RamPilot zaten yalnızca izin listesindeki uygulamalara dokunur; kod enjekte etmez, başka süreçlerin belleğini
-okumaz. Yine de hile önleyicilerin kuralları dışarıdan görülemez. Bir sorun görürseniz RamPilot'u duraklatın ve
-[bir kayıt açın](https://github.com/ilkerprdal/RamPilot/issues).
+### RamPilot bir RAM temizleyici ya da RAM hızlandırıcı mı?
 
-**CPU ya da pil harcar mı?**
+Hayır. RAM temizleyiciler bir zamanlayıcıyla ya da düğmeyle çalışma kümelerini tek seferde boşaltır
+(`EmptyWorkingSet` ya da benzeri). Sıcak sayfalar da gider, uygulamalar onları hemen geri çeker. RamPilot yalnızca
+boştaki, izin listesindeki uygulamaları sınırlar. Bir sürecin çalışma kümesinden önce en fazla %10, sonraki her adımda
+en fazla %15 alır. Sayfa hatalarını izler, uygulama belleğine ihtiyaç duyunca geri çekilir. Sistemi boşaltmaz, bir
+dakika sonra buharlaşan bir sayı göstermez, bilgisayarınızı hızlandırdığını iddia etmez. Sıkıştırma deposu
+maliyeti düşülmüş net kazancı raporlar.
+
+### Discord'un (ya da WhatsApp, Teams, Slack'in) RAM kullanımı nasıl azaltılır?
+
+Bu uygulamalar RamPilot'un varsayılan listesinde; ayarlamanız gereken bir şey yok. `RamPilot.exe`'yi başlatın ve
+uygulamayı arka planda bırakın. Uygulama 5 dakika kullanılmadığında RamPilot onun fiziksel bellekte tuttuğu alanı
+adım adım düşürmeye başlar. Uygulamaya geri dönmek sınırı hemen kaldırır; bir arama ya da ses çalma ise 2 saniyelik
+bir ölçüm adımı içinde kaldırır. Yapmadığı şeyler: uygulamayı siz kullanırken küçültmez, commit belleğini de
+azaltmaz. Bir gün boyunca ne kadar kazandırdığı henüz karşılaştırmalı olarak ölçülmedi; bkz.
+[Şimdiye kadarki sonuçlar](#şimdiye-kadarki-sonuçlar).
+
+### Varsayılan olarak hangi uygulamaları yönetir?
+
+WhatsApp (`WhatsApp.Root.exe`, `WhatsApp.exe`), Discord, ChatGPT, Slack, Microsoft Teams (yeni `ms-teams.exe` ve
+klasik `Teams.exe`), Notion ve Spotify; bunların `msedgewebview2.exe` yardımcı süreçleri de dahil. GPU, ses hizmeti ve
+çökme işleyici yardımcıları asla sınırlanmaz. Liste, `%LOCALAPPDATA%\RamPilot\config.json` içindeki `apps`
+dizisidir.
+
+### Signal, VS Code ya da Obsidian gibi başka uygulamalarla çalışır mı?
+
+Yerleşik engel listesinde olmayan her uygulamayı ekleyebilirsiniz. `config.json` içindeki mevcut `apps` dizisine bir
+girdi ekleyin (dizi varsayılanları zaten içerir; kendi yazdığınız bir `apps` dizisi varsayılan listenin yerini alır),
+ardından RamPilot'tan tepsi menüsüyle çıkıp yeniden başlatın:
+
+```jsonc
+"apps": [
+  { "exe": "WhatsApp.Root.exe", "name": "WhatsApp" },
+  // ...diğer varsayılanlar...
+  { "exe": "Signal.exe", "name": "Signal" }
+]
+```
+
+`exe`, uygulamanın ana sürecinin program adıdır; `name` isteğe bağlıdır ve yalnızca görüntüleme için kullanılır.
+Geliştirici yalnızca varsayılan uygulamaları denedi. Politika, boştaki belleği büyük ölçüde soğuk olan Electron ve
+WebView2 uygulamalarına göre ayarlandı; başka uygulamalarda güvenmeden önce günlüğe ve ölçüm CSV'sine bakın.
+
+### Chrome, Edge ya da Firefox'la çalışır mı?
+
+Tarayıcılar varsayılan listede değil ve denenmedi. Engel listesinde de değiller, yani ekleyebilirsiniz. Ama
+tarayıcılar arka plandaki sekmeleri zaten kendileri uyutur ya da boşaltır. Bütün gün kullandığınız bir tarayıcı da
+RamPilot'un beklediği 5 dakika boyunca nadiren boşta kalır. Fazla bir şey beklemeyin.
+
+### Oyunlarda işe yarar mı?
+
+Dolaylı olarak. Oyun başlatıcıları, hile önleyiciler (anti-cheat), güvenlik yazılımları ve bilinen oyun kütüphanesi
+klasörlerindeki (Steam, Epic, Riot, Battle.net, Xbox ve diğerleri) her şey programa derlenmiş bir engel listesindedir
+ve asla sınırlanmaz; RamPilot izin listesine eklemediğiniz bir uygulamaya zaten dokunmaz. Kod enjekte etmez, başka
+süreçlerin belleğini okumaz. Yapabileceği şey, oyunun yanında boşta bekleyen sohbet uygulamalarının belleğini
+düşürmektir. Henüz oyun algılama yok ve bir oyuna etkisi ölçülmedi. Hile önleyicilerin kuralları dışarıdan
+görülemez; bir sorun görürseniz RamPilot'u duraklatın ve [bir kayıt açın](https://github.com/ilkerprdal/RamPilot/issues).
+
+### "Commit" belleğini azaltır mı, "yetersiz bellek" hatalarını çözer mi?
+
+Hayır. Çalışma kümesi sınırı yalnızca fiziksel bellekte tutulan alanı azaltır. Özel bayt (private bytes) ve commit
+yükü aynı kalır.
+
+### Güvenli mi? Uygulamalarımı çökertebilir mi?
+
+Çalışma kümesi sınırı bir uygulamayı bozamaz. En kötü durumda uygulama, sayfaları geri çekmek zorunda kaldığı için
+yavaşlar; denetleyici bunu görünce sınırı yükseltir. Sınırlar odaklanınca, ses çalınca, uzun süreli CPU yükünde,
+duraklatınca ve çıkışta kalkar; motor öldürülürse bir bekçi süreç onları kaldırır. Bir sınırın RamPilot'tan sonra da
+kalabildiği tek durum ("İşlem ağacını sonlandır") için bkz. [güvenlik modeli](#güvenlik-modeli).
+
+### Mem Reduct, Wise Memory Optimizer ya da RAMMap'ten farkı ne?
+
+[Mem Reduct](https://github.com/henrypp/memreduct) sistem belleğini izler ve temizler: çalışma kümelerini, bekleme ve
+değiştirilmiş sayfa listelerini isteğe bağlı olarak, bir zamanlayıcıyla ya da kullanım belli bir eşiği aşınca boşaltır;
+yönetici hakkı ister. [Wise Memory Optimizer](https://www.wisecleaner.com/wise-memory-optimizer.html) RAM'i tek
+tıkla ya da kullanılabilir bellek seçtiğiniz seviyenin altına düşünce otomatik olarak boşaltır.
+[RAMMap](https://learn.microsoft.com/sysinternals/downloads/rammap) bir Sysinternals fiziksel bellek analiz aracıdır;
+Empty menüsüyle çalışma kümelerini ya da bekleme listesini elle, bir kez boşaltabilir. RamPilot'un sonuçlarını
+denetlemek için yanında kullanışlıdır. RamPilot ise sürekli çalışan, uygulama başına bir denetleyicidir: yalnızca
+boştaki, izin listesindeki uygulamaları sınırlar, kademeli ilerler ve durmak için sayfa hatası geri beslemesini
+kullanır. Ayrıca hepsinden çok daha yeni ve çok daha az sınanmıştır; onlarla karşılaştırmalı olarak ölçülmedi.
+
+### CPU ya da pil harcar mı?
+
 Motor 2 saniyede bir ölçüm alır ve yaklaşık 10–13&nbsp;MB özel bellek kullanır. Asıl maliyet Windows tarafındadır:
 kırpılan sayfaları sıkıştırmak ve yeniden dokunulanları açmak. Takılma bütçesi, geri çağırmaları tasarım gereği
 seyrek tutar. Pil etkisi henüz ölçülmedi; ölçüm planının bir parçası.
 
-**32 GB RAM'im var. Bir şey yapar mı?**
+### 32 GB RAM'im var. Bir şey yapar mı?
+
 Evet, ama daha az. Bol boş bellek varken yönetici "düşük" seviyededir (agresiflik 0,4). Sınırlar yine iner. Adımlar
 yaklaşık %10'dur, ama sınır inişin başında ölçülen çalışma kümesinin %60'ının altına hiç inmez; takılma bütçesi de
 daha sıkıdır. Bunun bir değeri olup olmadığı, RAM'inize başka neyin ihtiyaç duyduğuna bağlıdır. Belleği hiç
 azalmayan bir makinede çoğunlukla değmez. RamPilot'un yalnızca baskı altında çalışmasını istiyorsanız
 `"governor": { "lowAggressiveness": 0 }` ayarlayın. Sıfır agresiflikte hiçbir şey sınırlanmaz.
 
-**Windows bunu zaten yapmıyor mu?**
+### Windows bunu zaten yapmıyor mu?
+
 Kısmen yapıyor, hem de iyi yapıyor. Windows sistem baskı altındayken kırpar ve sıkıştırır. Yapmadığı şey, baskı
 oluşmadan *önce*, uygulama başına bir maliyet sinyaliyle, belirli boştaki uygulamalardan soğuk sayfaları geri
 almaktır. RamPilot en çok, bir tarayıcı, oyun ya da derleme yanında birkaç sohbet veya asistan uygulaması açık tutan
 8–16&nbsp;GB'lık makinelerde yardımcı olur. Bellek bolken Windows'un varsayılanı yeterlidir.
 
-**Bu bir "RAM hızlandırıcı" mı?**
-Hayır. Sistemi boşaltmaz, bir dakika sonra buharlaşan bir sayı göstermez, bilgisayarınızı hızlandırdığını iddia
-etmez. Boştaki uygulamaların soğuk belleğini adım adım sıkıştırma deposuna taşır ve bunun gerçekte ne kazandırdığını
-raporlar.
+### Görev Yöneticisi'ndeki "Kullanımda" değeri neden pek değişmiyor?
 
-**Görev Yöneticisi'ndeki "Kullanımda" değeri neden pek değişmiyor?**
 "Kullanımda" değeri sıkıştırma deposunu ve değiştirilmiş listeyi de içerir. Süreç başına çalışma kümesine,
 birkaç dakika boyunca "Kullanılabilir" değerine ve depo büyümesini zaten düşmüş olan RamPilot'un net sayısına bakın.
 
-**Herhangi bir uygulamayı ekleyebilir miyim?**
-Engel listesinde olmayan her uygulamayı. Politika, boştaki belleği büyük ölçüde soğuk olan Chromium tabanlı
-uygulamalara (Electron, WebView2) göre ayarlandı. Başka uygulamalarda güvenmeden önce ölçün.
+### Yönetici olarak çalışması gerekir mi?
 
-**Yönetici olarak çalışması gerekir mi?**
 Hayır. Normal kullanıcı olarak çalışmak üzere yapıldı ve yükseltme istemez. Yönetici olarak çalıştırmanın hiçbir
 faydası yok.
 
@@ -477,6 +579,23 @@ En değerli katkı, ölçüm içeren hata bildirimleridir. Başka donanımlarda 
 RamPilot'un işe yaramadığını gösterenler. Bkz. [`CONTRIBUTING.md`](CONTRIBUTING.md),
 [Davranış Kuralları](CODE_OF_CONDUCT.md) ve [`CHANGELOG.md`](CHANGELOG.md). Güvenlik sorunlarını
 [`SECURITY.md`](SECURITY.md) belgesinde anlatıldığı gibi gizli olarak bildirin.
+
+## Künye
+
+| | |
+|---|---|
+| Ad | RamPilot |
+| Ne | Boştaki arka plan uygulamalarının fiziksel bellekte tuttuğu alanı düşüren Windows tepsi aracı |
+| Yöntem | Sayfa hatası geri beslemesiyle adım adım düşürülen sert çalışma kümesi sınırları (`SetProcessWorkingSetSizeEx`) |
+| Varsayılan uygulamalar | WhatsApp, Discord, ChatGPT, Slack, Microsoft Teams, Notion, Spotify (`config.json` içinde değiştirilebilir) |
+| Asla dokunulmayanlar | Odaktaki uygulama, sesi açık uygulamalar, oyun başlatıcıları ve oyun kütüphanesi klasörleri, hile önleyiciler, güvenlik yazılımları |
+| Platform | Windows 10 21H2+ ve Windows 11, x64. Yalnızca Windows 11 derleme 26200 üzerinde denendi |
+| Gereksinimler | Yönetici hakkı gerekmez. Panel için WebView2 Runtime ve .NET 10 Desktop Runtime |
+| Lisans | MIT |
+| Fiyat | Ücretsiz |
+| Ağ / telemetri | Yok |
+| Durum | 0.1.0, erken aşama. Karşılaştırmalı ölçüm tanımlandı, henüz yapılmadı |
+| Kaynak | https://github.com/ilkerprdal/RamPilot |
 
 ## Lisans
 
