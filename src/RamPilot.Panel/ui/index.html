@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="color-scheme" content="dark light">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:">
+  <title>RamPilot</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app" id="app" data-conn="connecting">
+
+  <header class="topbar">
+    <div class="brand">
+      <img class="logo" src="icon.svg" alt="" aria-hidden="true">  <!-- = assets/RamPilot.svg -->
+
+      <span class="brand-name">RamPilot</span>
+      <span class="brand-sub" data-i18n="brand.sub"></span>
+      <span class="brand-version" id="engineVersion"></span>
+      <span class="demo-tag" id="demoTag" data-i18n="brand.demo" hidden></span>
+    </div>
+    <div class="topmeta">
+      <span class="pill" id="statePill" data-state="connecting"><span class="pill-dot" aria-hidden="true"></span><span id="stateText"></span></span>
+      <span class="meta-item" id="engineMemItem"><span data-i18n="meta.engineMem"></span> <strong id="engineMem">—</strong></span>
+      <span class="meta-item"><span data-i18n="meta.uptime"></span> <strong id="uptime">—</strong></span>
+      <div class="seg-toggle lang-toggle" role="group" data-i18n-aria-label="lang.label">
+        <button type="button" class="seg-btn" data-lang="tr" lang="tr">TR</button>
+        <button type="button" class="seg-btn" data-lang="en" lang="en">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="content" id="content">
+    <section class="summary">
+      <article class="card hero" aria-labelledby="heroLabel">
+        <h2 class="card-label" id="heroLabel" data-i18n="net.title"></h2>
+        <div class="hero-value" aria-live="polite"><span id="heroNum">—</span><span class="hero-unit" id="heroUnit"></span></div>
+        <div class="segbar segbar-thin" id="savingsBar" role="img">
+          <span class="seg seg-net" data-key="net"></span>
+          <span class="seg seg-cost" data-key="cost"></span>
+        </div>
+        <dl class="breakdown">
+          <div class="bd-row"><dt><span class="key key-none" aria-hidden="true"></span><span data-i18n="net.reclaimed"></span></dt><dd id="bdReclaimed">—</dd></div>
+          <div class="bd-row"><dt><span class="key key-cost" aria-hidden="true"></span><span data-i18n="net.storeCost"></span></dt><dd id="bdCost">—</dd></div>
+          <div class="bd-row bd-total"><dt><span class="key key-net" aria-hidden="true"></span><span data-i18n="net.net"></span></dt><dd id="bdNet">—</dd></div>
+        </dl>
+        <p class="hero-note" id="heroNote" data-i18n="net.note"></p>
+      </article>
+
+      <article class="card ram" aria-labelledby="ramLabel">
+        <div class="card-head">
+          <h2 class="card-label" id="ramLabel" data-i18n="ram.title"></h2>
+          <span class="card-aside" id="ramLoad"></span>
+        </div>
+        <div class="ram-figure"><span id="ramUsed">—</span><span class="ram-total" id="ramTotal"></span></div>
+        <div class="segbar" id="ramBar" role="img">
+          <span class="seg seg-used" data-key="used"></span>
+          <span class="seg seg-comp" data-key="comp"></span>
+          <span class="seg seg-avail" data-key="avail"></span>
+        </div>
+        <ul class="legend">
+          <li><span class="key key-used" aria-hidden="true"></span><span class="legend-name" data-i18n="ram.used"></span><span class="legend-val" id="lgUsed">—</span></li>
+          <li><span class="key key-comp" aria-hidden="true"></span><span class="legend-name" data-i18n="ram.compressed"></span><span class="legend-val" id="lgComp">—</span></li>
+          <li><span class="key key-avail" aria-hidden="true"></span><span class="legend-name" data-i18n="ram.available"></span><span class="legend-val" id="lgAvail">—</span></li>
+        </ul>
+        <div class="governor" id="governor" data-level="unknown">
+          <div class="gov-item">
+            <span class="gov-label" data-i18n="gov.pressure"></span>
+            <span class="pressure-meter" aria-hidden="true"><span></span><span></span><span></span></span>
+            <strong id="govLevel">—</strong>
+          </div>
+          <div class="gov-item">
+            <span class="gov-label" data-i18n="gov.aggr"></span>
+            <span class="aggr-meter" aria-hidden="true"><span class="aggr-fill" id="aggrFill"></span></span>
+            <strong id="govAggr">—</strong>
+          </div>
+          <p class="gov-hint" id="govHint"></p>
+        </div>
+      </article>
+    </section>
+
+    <section class="middle">
+      <article class="card chart-card" aria-labelledby="chartLabel">
+        <div class="card-head">
+          <h2 class="card-label" id="chartLabel" data-i18n="chart.title"></h2>
+          <div class="seg-toggle" role="group" data-i18n-aria-label="chart.viewGroup">
+            <button type="button" class="seg-btn" id="viewChart" aria-pressed="true" data-i18n="chart.viewChart"></button>
+            <button type="button" class="seg-btn" id="viewTable" aria-pressed="false" data-i18n="chart.viewTable"></button>
+          </div>
+        </div>
+        <div class="charts" id="charts" tabindex="0" data-i18n-aria-label="chart.aria">
+          <div class="chart" id="chartAvail">
+            <div class="chart-title"><span class="line-key key-avail" aria-hidden="true"></span><span data-i18n="chart.avail"></span></div>
+            <svg class="plot" aria-hidden="true"></svg>
+          </div>
+          <div class="chart" id="chartNet">
+            <div class="chart-title"><span class="line-key key-net" aria-hidden="true"></span><span data-i18n="chart.net"></span></div>
+            <svg class="plot" aria-hidden="true"></svg>
+          </div>
+          <p class="chart-empty" id="chartEmpty" data-i18n="chart.empty" hidden></p>
+        </div>
+        <div class="table-wrap" id="histTableWrap" hidden>
+          <table class="hist-table">
+            <thead><tr><th scope="col" data-i18n="chart.colTime"></th><th scope="col" class="num" data-i18n="chart.avail"></th><th scope="col" class="num" data-i18n="chart.net"></th></tr></thead>
+            <tbody id="histTable"></tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card events-card" aria-labelledby="eventsLabel">
+        <div class="card-head">
+          <h2 class="card-label" id="eventsLabel" data-i18n="events.title"></h2>
+          <span class="card-aside" id="eventsCount"></span>
+        </div>
+        <ol class="events" id="events"></ol>
+      </article>
+    </section>
+
+    <section class="card apps-card" aria-labelledby="appsLabel">
+      <div class="card-head">
+        <h2 class="card-label" id="appsLabel" data-i18n="apps.title"></h2>
+        <span class="card-aside" id="appsSummary"></span>
+      </div>
+      <div class="apps-grid apps-head" role="presentation">
+        <span data-i18n="apps.colApp"></span>
+        <span data-i18n="apps.colState"></span>
+        <span class="num" data-i18n="apps.colPrivate"></span>
+        <span class="num" data-i18n="apps.colCap"></span>
+        <span class="num"><span class="has-tip" data-i18n="apps.colReclaimed" data-i18n-title="apps.colReclaimedTip"></span></span>
+        <span class="center" data-i18n="apps.colManage"></span>
+      </div>
+      <div id="appList" role="list"></div>
+    </section>
+  </main>
+
+  <footer class="bottombar">
+    <button type="button" class="btn" id="btnPause">
+      <svg viewBox="0 0 16 16" aria-hidden="true" class="btn-icon"><path id="pauseIconPath" d="M5 3.5v9M11 3.5v9"/></svg>
+      <span id="btnPauseText"></span>
+    </button>
+    <div class="switch-field">
+      <button type="button" class="switch" role="switch" id="swAutostart" aria-checked="false" aria-labelledby="autostartLabel"><span class="switch-thumb"></span></button>
+      <span id="autostartLabel" data-i18n="footer.autostart"></span>
+    </div>
+    <span class="foot-note" id="footNote"></span>
+    <button type="button" class="btn btn-quiet" id="btnQuit" data-i18n="footer.quit"></button>
+  </footer>
+
+  <div class="overlay" id="overlay" hidden>
+    <div class="down-card" role="alertdialog" aria-labelledby="downTitle" aria-describedby="downText">
+      <svg class="down-icon" viewBox="0 0 48 48" aria-hidden="true">
+        <rect x="6" y="10" width="36" height="28" rx="6"/>
+        <path d="M15 31v-6M21 31v-10M27 31v-4M33 31v-8"/>
+      </svg>
+      <h1 id="downTitle"></h1>
+      <p id="downText"></p>
+      <button type="button" class="btn btn-accent" id="btnStart"></button>
+      <p class="down-hint" id="downHint"></p>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" hidden></div>
+</div>
+
+<dialog class="confirm" id="confirmQuit" aria-labelledby="confirmTitle">
+  <form method="dialog">
+    <h2 id="confirmTitle" data-i18n="confirm.title"></h2>
+    <p data-i18n="confirm.body"></p>
+    <div class="confirm-actions">
+      <button value="cancel" class="btn" autofocus data-i18n="confirm.cancel"></button>
+      <button value="ok" class="btn btn-danger" data-i18n="confirm.ok"></button>
+    </div>
+  </form>
+</dialog>
+
+<div class="tooltip" id="tooltip" hidden></div>
+<script src="i18n.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

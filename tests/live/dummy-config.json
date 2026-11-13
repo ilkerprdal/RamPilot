@@ -1,0 +1,8 @@
+{
+  // Live-test config: manage only the synthetic RpDummy.exe, at forced medium pressure.
+  "version": 1,
+  "apps": [ { "exe": "RpDummy.exe", "name": "Dummy" } ],
+  "helpers": [],
+  "policy": { "focusGraceSeconds": 10 },
+  "governor": { "pressureOverride": "medium" }
+}

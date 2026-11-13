@@ -1,0 +1,4 @@
+<Project>
+  <!-- Stops MSBuild from importing the repository-level Directory.Build.props:
+       this probe is a stand-alone experiment, not part of RamPilot.sln. -->
+</Project>

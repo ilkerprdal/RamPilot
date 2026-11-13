@@ -1,0 +1,96 @@
+name: Bug report
+description: Something went wrong, an app misbehaved while managed, or a number looks wrong.
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Measurements make bugs fixable, so please fill in as much as you can.
+
+        **Security issues:** do not file them here. See SECURITY.md (private vulnerability reporting).
+
+        **Before attaching logs:** files in `%LOCALAPPDATA%\RamPilot\` contain executable names and process IDs
+        of the apps you run. Review them and remove anything you do not want to share.
+
+  - type: input
+    id: version
+    attributes:
+      label: RamPilot version
+      description: "File version of RamPilot.exe: right-click it, Properties, Details."
+      placeholder: "0.1.0"
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: Windows version and build
+      description: "Run `winver`, or in PowerShell: `(Get-CimInstance Win32_OperatingSystem) | Select Caption, BuildNumber`"
+      placeholder: "Windows 11 Pro, build 26200"
+    validations:
+      required: true
+
+  - type: input
+    id: ram
+    attributes:
+      label: Installed RAM and pagefile
+      description: Installed RAM, and whether the pagefile is system-managed, fixed or disabled.
+      placeholder: "16 GB, system-managed pagefile"
+    validations:
+      required: true
+
+  - type: input
+    id: apps
+    attributes:
+      label: Affected app(s) and version(s)
+      placeholder: "Discord 1.0.9xxx, WhatsApp desktop 2.2xxx"
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: Include timing. For example "switching to Discord after 20 minutes idle took ~2 s to repaint".
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Start RamPilot with default settings
+        2. Leave Discord in the background for 15 minutes
+        3. Alt-Tab to Discord
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Output of `RamPilot.exe --summary --detail`
+      description: Run it while the problem is visible. It is copied verbatim; no formatting needed.
+      render: text
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Log and CSV excerpts
+      description: |
+        Logs, measurement CSVs and learned state are in `%LOCALAPPDATA%\RamPilot\`.
+        Paste the log lines around the time of the problem, or attach the files (zip them first).
+      render: text
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: Pausing RamPilot (tray, right click) made the problem go away.
+        - label: The problem also happens with RamPilot not running.
+        - label: I reviewed attached logs for information I do not want to share.
+          required: true

@@ -1,0 +1,24 @@
+# Build output
+bin/
+obj/
+artifacts/
+dist/
+publish/
+*.pdb
+
+# IDE
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# Local runtime data (never commit: contains local process names)
+*.log
+experiments/**/results/local-*
+bench/results/local-*
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store

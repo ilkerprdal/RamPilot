@@ -1,0 +1,98 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: "true"
+  DOTNET_CLI_TELEMETRY_OPTOUT: "true"
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "true"
+
+jobs:
+  release:
+    name: Build and draft release
+    runs-on: windows-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write      # create the draft release
+      id-token: write      # sign the provenance attestation
+      attestations: write  # store the attestation
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Resolve version
+        id: version
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $version = $tag.TrimStart('v')
+          [xml]$props = Get-Content Directory.Build.props
+          $declared = ($props.Project.PropertyGroup | Where-Object { $_.Version } | Select-Object -First 1).Version
+          $base = $version.Split('-')[0]
+          if ($declared -ne $base) {
+            Write-Error "Tag $tag does not match <Version>$declared</Version> in Directory.Build.props."
+            exit 1
+          }
+          "version=$version" >> $env:GITHUB_OUTPUT
+          "prerelease=$($version.Contains('-').ToString().ToLower())" >> $env:GITHUB_OUTPUT
+
+      - name: Build and test
+        run: |
+          dotnet restore RamPilot.sln
+          dotnet build RamPilot.sln -c Release --no-restore -warnaserror
+          dotnet test RamPilot.sln -c Release --no-build
+
+      - name: Publish
+        run: |
+          $v = "${{ steps.version.outputs.version }}"
+          dotnet publish src/RamPilot.Engine/RamPilot.Engine.csproj -c Release -r win-x64 "-p:Version=$v" -o artifacts/out/RamPilot
+          dotnet publish src/RamPilot.Panel/RamPilot.Panel.csproj -c Release -r win-x64 --self-contained false "-p:Version=$v" -o artifacts/out/RamPilot
+          New-Item -ItemType Directory -Force artifacts/symbols | Out-Null
+          Get-ChildItem artifacts/out/RamPilot -Recurse -Include *.pdb, *.dbg | Move-Item -Destination artifacts/symbols -Force
+          Get-ChildItem artifacts/out/RamPilot -Recurse -Include *.xml | Remove-Item -Force
+          Copy-Item LICENSE, THIRD-PARTY-NOTICES.md, README.md, README.tr.md, CHANGELOG.md artifacts/out/RamPilot/
+
+      - name: Package and hash
+        run: |
+          $v = "${{ steps.version.outputs.version }}"
+          New-Item -ItemType Directory -Force artifacts/release | Out-Null
+          $zip = "artifacts/release/RamPilot-$v-win-x64.zip"
+          $sym = "artifacts/release/RamPilot-$v-win-x64-symbols.zip"
+          Compress-Archive -Path artifacts/out/RamPilot/* -DestinationPath $zip -CompressionLevel Optimal
+          if (Get-ChildItem artifacts/symbols -ErrorAction SilentlyContinue) {
+            Compress-Archive -Path artifacts/symbols/* -DestinationPath $sym -CompressionLevel Optimal
+          }
+          # sha256sum-compatible format: "<hash>  <file name>"
+          Get-ChildItem artifacts/release/*.zip | ForEach-Object {
+            "{0}  {1}" -f (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant(), $_.Name
+          } | Set-Content -Encoding ascii artifacts/release/SHA256SUMS.txt
+          Get-Content artifacts/release/SHA256SUMS.txt
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: artifacts/release/*.zip
+
+      - name: Create draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = "${{ github.ref_name }}"
+          # gh does not expand globs on Windows; pass explicit file paths.
+          $files = @(Get-ChildItem artifacts/release/*.zip | ForEach-Object FullName) + (Resolve-Path artifacts/release/SHA256SUMS.txt).Path
+          $ghArgs = @('release', 'create', $tag) + $files + @('--draft', '--title', "RamPilot $tag", '--generate-notes', '--verify-tag')
+          if ("${{ steps.version.outputs.prerelease }}" -eq 'true') { $ghArgs += '--prerelease' }
+          gh @ghArgs

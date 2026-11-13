@@ -1,0 +1,42 @@
+# Normalize line endings in the repository (LF in the index) and check out with the endings .editorconfig expects.
+* text=auto
+
+# Windows project: CRLF in the working tree, matching .editorconfig (end_of_line = crlf).
+*.cs        text eol=crlf diff=csharp
+*.csproj    text eol=crlf
+*.props     text eol=crlf
+*.targets   text eol=crlf
+*.sln       text eol=crlf
+*.slnx      text eol=crlf
+*.json      text eol=crlf
+*.xml       text eol=crlf
+*.manifest  text eol=crlf
+*.config    text eol=crlf
+*.editorconfig text eol=crlf
+.editorconfig text eol=crlf
+*.ps1       text eol=crlf
+*.psm1      text eol=crlf
+*.psd1      text eol=crlf
+*.cmd       text eol=crlf
+*.bat       text eol=crlf
+*.md        text eol=crlf
+*.txt       text eol=crlf
+*.csv       text eol=crlf
+*.html      text eol=crlf
+*.css       text eol=crlf
+*.js        text eol=crlf
+*.yml       text eol=crlf
+*.yaml      text eol=crlf
+
+# POSIX shell scripts must keep LF.
+*.sh        text eol=lf
+
+# Binaries
+*.png  binary
+*.jpg  binary
+*.gif  binary
+*.ico  binary
+*.dll  binary
+*.exe  binary
+*.pdb  binary
+*.zip  binary

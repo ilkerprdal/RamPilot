@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <AssemblyName>RamPilot</AssemblyName>
+    <RootNamespace>RamPilot</RootNamespace>
+    <ApplicationIcon>..\..\assets\RamPilot.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">win-x64</RuntimeIdentifier>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <ServerGarbageCollector>false</ServerGarbageCollector>
+    <ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>
+    <TieredPGO>true</TieredPGO>
+    <!-- Native AOT single exe: `dotnet publish -c Release` (needs the MSVC build tools and vswhere on PATH). -->
+    <PublishAot>true</PublishAot>
+    <OptimizationPreference>Size</OptimizationPreference>
+    <!-- Keep method names in stack traces: crash reports from users must be readable. -->
+    <IlcGenerateStackTraceData>true</IlcGenerateStackTraceData>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- The GC gen0 budget is derived from the L3 size by default (large on desktop CPUs) and lets a tiny engine
+         accumulate tens of MB before collecting. Cap it at 4 MB; embedded into RhConfig under Native AOT. -->
+    <IlcArg Include="--runtimeopt:GCgen0size=400000" />
+    <IlcArg Include="--runtimeopt:GCConserveMemory=7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RamPilot.Core\RamPilot.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Fallback tray icon next to the exe (the primary source is the exe's own icon resource). -->
+    <None Include="..\..\assets\RamPilot.ico" Link="RamPilot.ico" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

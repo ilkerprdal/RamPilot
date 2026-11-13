@@ -1,0 +1,100 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  DOTNET_NOLOGO: "true"
+  DOTNET_CLI_TELEMETRY_OPTOUT: "true"
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "true"
+  # Native AOT engine size budget for RamPilot.exe, in MB. Raise deliberately, in a reviewed PR.
+  ENGINE_SIZE_BUDGET_MB: "8"
+
+jobs:
+  build:
+    name: Build, test, publish (win-x64)
+    runs-on: windows-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore
+        run: dotnet restore RamPilot.sln
+
+      - name: Build (warnings as errors)
+        run: dotnet build RamPilot.sln -c Release --no-restore -warnaserror
+
+      - name: Test
+        run: dotnet test RamPilot.sln -c Release --no-build --logger "trx;LogFilePrefix=test" --results-directory artifacts/test-results
+
+      - name: Check formatting
+        run: dotnet format RamPilot.sln --verify-no-changes --no-restore --verbosity minimal
+
+      - name: Publish engine (Native AOT)
+        run: dotnet publish src/RamPilot.Engine/RamPilot.Engine.csproj -c Release -r win-x64 -o artifacts/out/RamPilot
+
+      - name: Publish panel
+        run: dotnet publish src/RamPilot.Panel/RamPilot.Panel.csproj -c Release -r win-x64 --self-contained false -o artifacts/out/RamPilot
+
+      - name: Separate symbols
+        run: |
+          New-Item -ItemType Directory -Force artifacts/symbols | Out-Null
+          Get-ChildItem artifacts/out/RamPilot -Recurse -Include *.pdb, *.dbg | Move-Item -Destination artifacts/symbols -Force
+          Get-ChildItem artifacts/out/RamPilot -Recurse -Include *.xml | Remove-Item -Force
+
+      - name: Check engine size budget
+        run: |
+          $exe = Get-Item artifacts/out/RamPilot/RamPilot.exe
+          $sizeMb = [math]::Round($exe.Length / 1MB, 2)
+          $budget = [double]$env:ENGINE_SIZE_BUDGET_MB
+          "| File | Size (MB) | Budget (MB) |`n|---|---|---|`n| RamPilot.exe | $sizeMb | $budget |" >> $env:GITHUB_STEP_SUMMARY
+          if ($sizeMb -gt $budget) {
+            Write-Error "RamPilot.exe is $sizeMb MB, over the $budget MB budget."
+            exit 1
+          }
+          "RamPilot.exe: $sizeMb MB (budget $budget MB)"
+
+      - name: Upload build
+        uses: actions/upload-artifact@v4
+        with:
+          name: RamPilot-win-x64-${{ github.sha }}
+          path: artifacts/out/RamPilot
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload symbols
+        uses: actions/upload-artifact@v4
+        with:
+          name: RamPilot-win-x64-symbols-${{ github.sha }}
+          path: artifacts/symbols
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ github.sha }}
+          path: artifacts/test-results
+          if-no-files-found: ignore
+          retention-days: 14

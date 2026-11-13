@@ -1,0 +1,37 @@
+run,step,ws_before_mb,ws_immediate_mb,ws_after2s_mb,limits_after,guard
+1,touch region (baseline),323.023,323.172,323.25,min=200KB max=1380KB flags=0xA,ok
+1,hard max 150 MB (below WS),323.25,150.031,150.031,min=1024KB max=153600KB flags=0x6,ok
+1,raise hard max to 1024 MB,150.031,150.031,151.559,min=1024KB max=1048576KB flags=0x6,ok
+1,touch region under 1024 MB hard max,151.559,305.004,305.004,min=1024KB max=1048576KB flags=0x6,ok
+1,disable hard max (soft max 1024 MB),305.004,305.004,304.988,min=1024KB max=1048576KB flags=0xA,ok
+1,soft max 10 MB (MAX_DISABLE),304.988,10.1094,10.1094,min=1024KB max=10240KB flags=0xA,ok
+1,touch region under 10 MB soft max,10.1094,305.391,305.391,min=1024KB max=10240KB flags=0xA,ok
+1,soft max = 0.5 x WS,305.391,152.008,153.457,min=1024KB max=155648KB flags=0xA,ok
+1,touch region again,153.457,302.387,302.387,min=1024KB max=155648KB flags=0xA,ok
+1,soft max = 2 x WS,302.387,302.387,302.387,min=1024KB max=618496KB flags=0xA,ok
+1,hard max = WS + 64 MB (above WS),302.387,302.387,302.387,min=1024KB max=374784KB flags=0x6,ok
+1,touch region under hard max above WS,302.387,307.32,307.52,min=1024KB max=374784KB flags=0x6,ok
+2,touch region (baseline),322.789,322.945,323.004,min=200KB max=1380KB flags=0xA,ok
+2,hard max 150 MB (below WS),323.004,150.035,150.035,min=1024KB max=153600KB flags=0x6,ok
+2,raise hard max to 1024 MB,150.035,150.035,151.559,min=1024KB max=1048576KB flags=0x6,ok
+2,touch region under 1024 MB hard max,151.559,305.047,305.047,min=1024KB max=1048576KB flags=0x6,ok
+2,disable hard max (soft max 1024 MB),305.047,305.047,305.027,min=1024KB max=1048576KB flags=0xA,ok
+2,soft max 10 MB (MAX_DISABLE),305.027,10.0195,10.0195,min=1024KB max=10240KB flags=0xA,ok
+2,touch region under 10 MB soft max,10.0195,305.992,305.992,min=1024KB max=10240KB flags=0xA,ok
+2,soft max = 0.5 x WS,305.992,152,153.465,min=1024KB max=155648KB flags=0xA,ok
+2,touch region again,153.465,302.426,302.426,min=1024KB max=155648KB flags=0xA,ok
+2,soft max = 2 x WS,302.426,302.426,302.426,min=1024KB max=618496KB flags=0xA,ok
+2,hard max = WS + 64 MB (above WS),302.426,302.426,302.426,min=1024KB max=374784KB flags=0x6,ok
+2,touch region under hard max above WS,302.426,307.547,307.555,min=1024KB max=374784KB flags=0x6,ok
+3,touch region (baseline),322.91,323.059,323.109,min=200KB max=1380KB flags=0xA,ok
+3,hard max 150 MB (below WS),323.109,150.031,150.031,min=1024KB max=153600KB flags=0x6,ok
+3,raise hard max to 1024 MB,150.031,150.031,151.562,min=1024KB max=1048576KB flags=0x6,ok
+3,touch region under 1024 MB hard max,151.562,305.031,305.031,min=1024KB max=1048576KB flags=0x6,ok
+3,disable hard max (soft max 1024 MB),305.031,305.031,305.012,min=1024KB max=1048576KB flags=0xA,ok
+3,soft max 10 MB (MAX_DISABLE),305.012,10.0234,10.0234,min=1024KB max=10240KB flags=0xA,ok
+3,touch region under 10 MB soft max,10.0234,305.234,305.234,min=1024KB max=10240KB flags=0xA,ok
+3,soft max = 0.5 x WS,305.234,152,153.059,min=1024KB max=155648KB flags=0xA,ok
+3,touch region again,153.059,305.477,305.477,min=1024KB max=155648KB flags=0xA,ok
+3,soft max = 2 x WS,305.477,305.477,305.477,min=1024KB max=624640KB flags=0xA,ok
+3,hard max = WS + 64 MB (above WS),305.477,305.477,305.477,min=1024KB max=377856KB flags=0x6,ok
+3,touch region under hard max above WS,305.477,307.93,307.93,min=1024KB max=377856KB flags=0x6,ok

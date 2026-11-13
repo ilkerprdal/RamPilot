@@ -1,0 +1,104 @@
+RamPilot engine rework: live evidence, 2026-11-13 (Windows 11 Pro 26200, 16 GB RAM, ~7 GB available = "low" pressure)
+Excerpts from %LOCALAPPDATA%\RamPilot\rampilot.log, guardian.log and metrics_*.csv. Process names are WhatsApp and
+the synthetic tests\live\DummyApp (RpDummy.exe). Times are local.
+
+== Build / tests / publish
+dotnet build RamPilot.sln (TreatWarningsAsErrors, analyzers latest-recommended): 0 warnings, 0 errors
+dotnet test: 78 passed, 0 failed (RamPilot.Core.Tests)
+build.ps1: tests 78/78, Native AOT engine published (RamPilot.exe 3.6 MB) + panel, to artifacts\publish
+RamPilot.exe icon: System.Drawing.Icon.ExtractAssociatedIcon -> 32x32 RamPilot icon (RAM chip + arrow)
+Tray: "tray icon: resource 32512, 16 px" (LoadIconMetric from the exe's RT_GROUP_ICON 32512); screenshot docs\images\tray.png
+(captured via Shell_NotifyIconGetRect; IsPromoted was set to 1 for the capture only and put back afterwards)
+
+== IPC v2 (tests\live\pipe-client.ps1, pipe \\.\pipe\RamPilot.1)
+{"cmd":"hello","protocol":2}  -> {"ok":true,"protocol":2,"engineVersion":"0.1.0"}
+{"cmd":"hello","protocol":1}  -> {"ok":false,"error":"protocol_mismatch","protocol":2,"engineVersion":"0.1.0"}
+{"cmd":"diag"}                -> {"ok":false,"error":"unknown_cmd"}
+garbage                       -> {"ok":false,"error":"bad_request"}
+setApp steam.exe              -> {"ok":false,"error":"not_allowed"}
+5 KB request line             -> connection closed, no reply; next connection works
+status (excerpt)              -> {"protocol":2,"engineVersion":"0.1.0","paused":false,...,"engine":{"wsMb":21.9,"privateMb":7},
+                                  "system":{"totalMb":15995.9,"availMb":7143.9,"compressionMb":152.8,"loadPct":55,"commitPct":23},
+                                  "governor":{"pressure":"low","aggressiveness":0.4},"savings":{"reclaimedMb":0,...},"apps":[...]}
+
+== Run A (10:26:36-10:28:36, stopped with IPC quit to change the store estimator): gradual descent, no slam
+10:27:36 descent WhatsApp.Root.exe(7620) main            cap=81.7 MB  ws=102.1   (0.80 x WS)
+10:27:36 descent msedgewebview2.exe(13536) main          cap=61.5 MB  ws=76.9
+10:27:36 descent msedgewebview2.exe(15296) renderer      cap=185.9 MB ws=232.4
+10:28:06 lower   7620   81.7 -> 73.1 MB   13536  61.5 -> 55.1 MB   15296  185.9 -> 166.4 MB   (x0.895 per 30 s at low pressure)
+10:28:16 raise   7620   73.1 -> 109.6 MB reason=stall faults=354 hard=56 floor=80.4 MB
+10:28:36 exit: all limits released;  guardian: cleared 0 hard limit(s)
+Note: the store grew only +0.6 MB in 6 s for 56.8 MB trimmed -> observation window lengthened to 30 s, ratio floor 0.25.
+
+== Run B (10:29:19-10:40:12, tray mode, 11 min, WhatsApp, pressure low, a = 0.4)
+10:29:19 self-check passed; learned profiles: 3 loaded; guardian started; tracking 8 WhatsApp processes
+         (gpu-process, crashpad-handler, utility:audio.mojom.AudioService excluded from their command lines)
+10:30:33 descent 15296 renderer cap=169.6 ws=212.0      10:30:35 release 15296 reason=active
+10:31:05 descent 13536 main cap=59.7 ws=74.7            10:31:09 release 13536 reason=active
+10:31:17 descent 15296 renderer cap=181.8 ws=227.3 pws=203.4
+10:31:23 raise   15296 181.8 -> 272.7 MB reason=refaults faults=920 floor=200.0
+10:31:39 descent 13536 main cap=41.5 ws=51.9
+10:32:11 lower   13536 41.5 -> 37.2
+10:32:37 raise   13536 37.2 -> 55.8 reason=refaults faults=2877 floor=40.9
+10:32:45 release 13536 reason=active
+10:32:47 descent 7620 main cap=80.4 (floor from run A)  10:33:01 raise 7620 80.4 -> 120.6 reason=stall hard=42 floor=88.4
+10:34:25 descent 13536 main cap=40.9 (= floor) ws=49.1
+10:35:53 release 13536 reason=active prev=40.9
+10:38:51 restore 13536 main cap=40.9 MB learned=40.9 MB ws=58.6     <- learned-cap reuse after an activity burst, no new descent
+10:39:03 release 13536 reason=active
+Summary: 9 cap episodes, 3 raises (each followed by a floor, no repeat below it), no cap below floor/32 MB.
+Engine itself: ws 25-28 MB, private 10.4 -> 13.0 MB over the run.
+
+Status snapshots (pipe, once a minute):
+10:32:18 savings reclaimed 36.2 / storeCost 9.0 / net 27.1 MB, app state Mixed, avail 6821 MB
+10:35:21 savings reclaimed 10.9 / storeCost 3.5 / net 7.3 MB, app state Holding
+10:39:24 savings reclaimed 10.6 / storeCost 2.6 / net 7.9 MB, app state Holding, avail 7053 MB
+
+Savings plausibility vs measured private WS (metrics_20261113_102919.csv):
+15296 renderer: entry pws 203.4 MB (10:31:17); 10:32:11 pws 175.6 -> CSV reclaimed 27.8 MB = 203.4 - 175.6 (commit unchanged)
+                10:39:21 pws 192.8 -> reclaimed 10.6 MB = 203.4 - 192.8
+13536 main:     entry pws 22.7 MB; 10:32:11 pws 18.3 -> reclaimed 4.4 MB
+=> reclaimed equals the measured private-WS reduction since entry; net = reclaimed x (1 - r), r = 0.25-0.32 measured/clamped.
+   Savings are small because pressure is low (depth limit 60 % of WS) and WhatsApp was busy (renderer churn, CPU bursts).
+
+== Hard-kill test (run B binary): Stop-Process -Force on the engine while WhatsApp is capped
+before: 15296 msedgewebview2 max=272.7 MB flags=0x6 HARD_MAX;  7620 WhatsApp.Root max=120.6 MB flags=0x6 HARD_MAX
+10:40:12.888 Stop-Process -Id 19376 -Force
+guardian: engine 19376 exited with code 4294967295
+leftover scan: cleared hard limit on WhatsApp.Root.exe (7620); on msedgewebview2.exe (15296)
+guardian: cleared 2 hard limit(s), 0 failure(s) in 4 ms
+after (tests\live\check-caps.ps1, independent GetProcessWorkingSetSizeEx): hard-capped processes: 0; journal.txt deleted
+
+== Startup leftover scan (synthetic): a hard max of 200 MB planted on RpDummy.exe by a separate script, then engine start
+check-caps before: RpDummy max=200.0 MB flags=0x6 HARD_MAX
+10:42:48 leftover scan: cleared hard limit on RpDummy.exe (23108); event leftover_cleared app=RpDummy.exe count=1
+
+== Victim-selection finding (synthetic RpDummy: 300 MB dirty, 30 MB hot touched every second, 40 MB every 120 s)
+Run C (hot set allocated first): 10:42:58 descent cap=160 ws=199.9 ... 10:44:04 raise 160 -> 239.9 faults=982 floor=176
+Run D (persisted learned cap on a NEW instance, 13 s old): 10:49:59 restore cap=239.9 ws=323
+        10:50:01 raise 239.9 -> 359.9 faults=7722 (30 MB of hot pages refaulted in 2 s)
+Run E (hot set allocated last, 13 s old): 10:52:07 descent cap=258.4 ws=323; 10:52:23 raise faults=4052
+Manual, same RpDummy ~10 min old (not via the engine):
+  hard max 200 MB, held:            ws 284 -> 200 MB, faults/2s = 0 0 0 0 0 0 0 0 0 157(GC sweep) 0 0 0 0 0
+  hard max 200 then relaxed to 280: faults/2s all 0 except one 154 (GC sweep)
+=> Trimming a freshly started process evicts hot pages (no aging data yet). The same trim on an aged process is clean.
+   Fix: policy.minProcessAgeSeconds = 300 (Controller test YoungProcessesAreNotCapped). The cost loop protected latency
+   in every case (raise within one tick + floor).
+
+== Final binary (11:04:41-11:05:50): persisted-profile restore + hard kill
+11:05:41 restore 7620  cap=120.6 learned=120.6 ws=129.4
+11:05:41 restore 13536 cap=53.4 (= 0.5 x ws 106.9, bounded; learned 40.9 reached by fast steps)
+11:05:41 restore 15296 cap=272.7 learned=272.7 ws=394.8
+journal.txt before the kill: 7620|...|WhatsApp.Root.exe  13536|...  15296|...   (written before the caps)
+11:05:50.677 Stop-Process -Force -> guardian: cleared 3 hard limit(s), 0 failure(s) in 6 ms; check-caps: 0
+End state: no RamPilot/RpDummy process running; RamPilot.exe --summary: "processes with a hard working-set limit: 0".
+
+== Policy alignment with experiments/README.md (probes A/B), 12:16
+New defaults: firstCapIdleSeconds=300, minProcessAgeSeconds=300, startRatio=0.9, restore = one 0.9 x WS step then fast steps,
+uncapped fault baseline subtracted. Sanity run 12:16:06-12:17:36 (final binary): no cap in the first 90 s (old binary capped at
+60 s), clean exit "all limits released", guardian cleared 0, check-caps: 0. Tests 81/81.
+
+== Final-review fixes, sanity run 12:39:08-12:45:38 (6.5 min, final binary)
+Guardian killed at 12:40:10 -> "guardian restarted (pid 13216, start #2)". No cap applied: WhatsApp kept spawning
+renderers and showing CPU activity, so the 300 s first-cap idle rule never completed. Clean exit "all limits released",
+guardian cleared 0, check-caps: 0, no journal left. Tests 85/85; dotnet format --verify-no-changes exit 0.

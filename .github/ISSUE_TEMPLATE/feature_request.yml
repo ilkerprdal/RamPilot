@@ -1,0 +1,43 @@
+name: Feature request
+description: Suggest a capability, a new app to support, or a change in behaviour.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        RamPilot aims to be small, safe and measurable. Requests that come with a concrete problem and a way
+        to measure the outcome are the easiest to evaluate.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What are you trying to do, and what gets in the way today?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: How should RamPilot behave? Mention any safety concern you can think of.
+    validations:
+      required: true
+
+  - type: textarea
+    id: measure
+    attributes:
+      label: How would we know it works?
+      description: For example, a metric from bench/README.md that should improve, or a behaviour that should stop.
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+
+  - type: input
+    id: app
+    attributes:
+      label: App to support (if this is a new-app request)
+      description: Executable name, framework (Electron, WebView2, other) and version.
+      placeholder: "Signal.exe, Electron, 7.x"

@@ -1,0 +1,24 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = crlf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+[*.{json,yml,yaml,html,css,js,props,csproj}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.cs]
+csharp_style_namespace_declarations = file_scoped:warning
+csharp_prefer_braces = when_multiline:suggestion
+dotnet_style_qualification_for_field = false:suggestion
+dotnet_sort_system_directives_first = true
+# P/Invoke heavy code: allow DllImport where LibraryImport source-gen is not used
+dotnet_diagnostic.SYSLIB1054.severity = suggestion
+dotnet_diagnostic.CA1416.severity = none   # Windows-only project

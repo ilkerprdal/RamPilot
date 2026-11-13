@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Common settings (nullable, analyzers, warnings-as-errors, artifacts path) come from Directory.Build.props. -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <AssemblyName>RamPilot.Panel</AssemblyName>
+    <RootNamespace>RamPilot.Panel</RootNamespace>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <ServerGarbageCollector>false</ServerGarbageCollector>
+    <ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>
+    <TieredPGO>true</TieredPGO>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- Shared app icon (exe, window, taskbar). Single source of truth: assets\RamPilot.ico -->
+    <ApplicationIcon>..\..\assets\RamPilot.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\assets\RamPilot.ico" LogicalName="RamPilot.Panel.RamPilot.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="ui\**" />
+    <Content Include="ui\**" CopyToOutputDirectory="PreserveNewest" />
+    <!-- In-page logo comes from the single vector master -->
+    <Content Include="..\..\assets\RamPilot.svg" Link="ui\icon.svg" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4314.35" />
+  </ItemGroup>
+
+  <!-- The WebView2 package references its WPF control unconditionally; a WinForms app does not need it
+       (and it causes a WindowsBase version conflict). -->
+  <Target Name="DropWebView2Wpf" BeforeTargets="ResolveAssemblyReferences">
+    <ItemGroup>
+      <Reference Remove="@(Reference)" Condition="'%(Filename)' == 'Microsoft.Web.WebView2.Wpf'" />
+    </ItemGroup>
+  </Target>
+
+</Project>

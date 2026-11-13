@@ -1,0 +1,282 @@
+== C trim-on-call: region 300 MB, runs 3
+run 1 touch region (baseline)                          WS  323.0 ->  323.2 (2s:  323.2) MB | min=200KB max=1380KB flags=0xA | ok
+run 1 hard max 150 MB (below WS)                       WS  323.2 ->  150.0 (2s:  150.0) MB | min=1024KB max=153600KB flags=0x6 | ok
+run 1 raise hard max to 1024 MB                        WS  150.0 ->  150.0 (2s:  151.6) MB | min=1024KB max=1048576KB flags=0x6 | ok
+run 1 touch region under 1024 MB hard max              WS  151.6 ->  305.0 (2s:  305.0) MB | min=1024KB max=1048576KB flags=0x6 | ok
+run 1 disable hard max (soft max 1024 MB)              WS  305.0 ->  305.0 (2s:  305.0) MB | min=1024KB max=1048576KB flags=0xA | ok
+run 1 soft max 10 MB (MAX_DISABLE)                     WS  305.0 ->   10.1 (2s:   10.1) MB | min=1024KB max=10240KB flags=0xA | ok
+run 1 touch region under 10 MB soft max                WS   10.1 ->  305.4 (2s:  305.4) MB | min=1024KB max=10240KB flags=0xA | ok
+run 1 soft max = 0.5 x WS                              WS  305.4 ->  152.0 (2s:  153.5) MB | min=1024KB max=155648KB flags=0xA | ok
+run 1 touch region again                               WS  153.5 ->  302.4 (2s:  302.4) MB | min=1024KB max=155648KB flags=0xA | ok
+run 1 soft max = 2 x WS                                WS  302.4 ->  302.4 (2s:  302.4) MB | min=1024KB max=618496KB flags=0xA | ok
+run 1 hard max = WS + 64 MB (above WS)                 WS  302.4 ->  302.4 (2s:  302.4) MB | min=1024KB max=374784KB flags=0x6 | ok
+run 1 touch region under hard max above WS             WS  302.4 ->  307.3 (2s:  307.5) MB | min=1024KB max=374784KB flags=0x6 | ok
+run 1: VALID (no unexplained WS drop)
+run 2 touch region (baseline)                          WS  322.8 ->  322.9 (2s:  323.0) MB | min=200KB max=1380KB flags=0xA | ok
+run 2 hard max 150 MB (below WS)                       WS  323.0 ->  150.0 (2s:  150.0) MB | min=1024KB max=153600KB flags=0x6 | ok
+run 2 raise hard max to 1024 MB                        WS  150.0 ->  150.0 (2s:  151.6) MB | min=1024KB max=1048576KB flags=0x6 | ok
+run 2 touch region under 1024 MB hard max              WS  151.6 ->  305.0 (2s:  305.0) MB | min=1024KB max=1048576KB flags=0x6 | ok
+run 2 disable hard max (soft max 1024 MB)              WS  305.0 ->  305.0 (2s:  305.0) MB | min=1024KB max=1048576KB flags=0xA | ok
+run 2 soft max 10 MB (MAX_DISABLE)                     WS  305.0 ->   10.0 (2s:   10.0) MB | min=1024KB max=10240KB flags=0xA | ok
+run 2 touch region under 10 MB soft max                WS   10.0 ->  306.0 (2s:  306.0) MB | min=1024KB max=10240KB flags=0xA | ok
+run 2 soft max = 0.5 x WS                              WS  306.0 ->  152.0 (2s:  153.5) MB | min=1024KB max=155648KB flags=0xA | ok
+run 2 touch region again                               WS  153.5 ->  302.4 (2s:  302.4) MB | min=1024KB max=155648KB flags=0xA | ok
+run 2 soft max = 2 x WS                                WS  302.4 ->  302.4 (2s:  302.4) MB | min=1024KB max=618496KB flags=0xA | ok
+run 2 hard max = WS + 64 MB (above WS)                 WS  302.4 ->  302.4 (2s:  302.4) MB | min=1024KB max=374784KB flags=0x6 | ok
+run 2 touch region under hard max above WS             WS  302.4 ->  307.5 (2s:  307.6) MB | min=1024KB max=374784KB flags=0x6 | ok
+run 2: VALID (no unexplained WS drop)
+run 3 touch region (baseline)                          WS  322.9 ->  323.1 (2s:  323.1) MB | min=200KB max=1380KB flags=0xA | ok
+run 3 hard max 150 MB (below WS)                       WS  323.1 ->  150.0 (2s:  150.0) MB | min=1024KB max=153600KB flags=0x6 | ok
+run 3 raise hard max to 1024 MB                        WS  150.0 ->  150.0 (2s:  151.6) MB | min=1024KB max=1048576KB flags=0x6 | ok
+run 3 touch region under 1024 MB hard max              WS  151.6 ->  305.0 (2s:  305.0) MB | min=1024KB max=1048576KB flags=0x6 | ok
+run 3 disable hard max (soft max 1024 MB)              WS  305.0 ->  305.0 (2s:  305.0) MB | min=1024KB max=1048576KB flags=0xA | ok
+run 3 soft max 10 MB (MAX_DISABLE)                     WS  305.0 ->   10.0 (2s:   10.0) MB | min=1024KB max=10240KB flags=0xA | ok
+run 3 touch region under 10 MB soft max                WS   10.0 ->  305.2 (2s:  305.2) MB | min=1024KB max=10240KB flags=0xA | ok
+run 3 soft max = 0.5 x WS                              WS  305.2 ->  152.0 (2s:  153.1) MB | min=1024KB max=155648KB flags=0xA | ok
+run 3 touch region again                               WS  153.1 ->  305.5 (2s:  305.5) MB | min=1024KB max=155648KB flags=0xA | ok
+run 3 soft max = 2 x WS                                WS  305.5 ->  305.5 (2s:  305.5) MB | min=1024KB max=624640KB flags=0xA | ok
+run 3 hard max = WS + 64 MB (above WS)                 WS  305.5 ->  305.5 (2s:  305.5) MB | min=1024KB max=377856KB flags=0x6 | ok
+run 3 touch region under hard max above WS             WS  305.5 ->  307.9 (2s:  307.9) MB | min=1024KB max=377856KB flags=0x6 | ok
+run 3: VALID (no unexplained WS drop)
+CSV: <repo>\experiments\results\kernel-probe\C_trim_20261113_104019.csv
+== A victim A1_slam150: region 400 MB (private), hot 40 MB stride every 100 ms, warmup 30s, caps 150 MB x 60s, runs 3
+run 1: pre-cap hot 100.0% cold 100.0% resident
+run 1: cap 150 MB (call 23.9 ms) immediate hot 37.3% cold 37.3% | after 60s hot 100.0% cold 29.7% | faults during step 7752 (129.2/s)
+run 1: VALID (no external trim detected)
+run 2: pre-cap hot 100.0% cold 100.0% resident
+run 2: cap 150 MB (call 22.8 ms) immediate hot 37.2% cold 37.2% | after 60s hot 100.0% cold 29.6% | faults during step 7711 (128.5/s)
+run 2: VALID (no external trim detected)
+run 3: pre-cap hot 100.0% cold 100.0% resident
+run 3: cap 150 MB (call 23.4 ms) immediate hot 37.3% cold 37.3% | after 60s hot 100.0% cold 29.7% | faults during step 7755 (129.2/s)
+run 3: VALID (no external trim detected)
+CSV: <repo>\experiments\results\kernel-probe\A_A1_slam150_20261113_104133.csv
+== A victim A2_gentle300_then150: region 400 MB (private), hot 40 MB stride every 100 ms, warmup 30s, caps 300,150 MB x 30s, runs 3
+run 1: pre-cap hot 100.0% cold 100.0% resident
+run 1: cap 300 MB (call 14.9 ms) immediate hot 74.7% cold 74.7% | after 30s hot 100.0% cold 71.3% | faults during step 3476 (115.9/s)
+run 1: cap 150 MB (call 12.9 ms) immediate hot 77.3% cold 32.1% | after 30s hot 100.0% cold 28.8% | faults during step 3375 (112.5/s)
+run 1: VALID (no external trim detected)
+run 2: pre-cap hot 100.0% cold 100.0% resident
+run 2: cap 300 MB (call 15.3 ms) immediate hot 74.7% cold 74.7% | after 30s hot 100.0% cold 71.3% | faults during step 3400 (113.3/s)
+run 2: cap 150 MB (call 12.8 ms) immediate hot 78.3% cold 32.1% | after 30s hot 100.0% cold 28.9% | faults during step 3250 (108.3/s)
+run 2: VALID (no external trim detected)
+run 3: pre-cap hot 100.0% cold 100.0% resident
+run 3: cap 300 MB (call 15.8 ms) immediate hot 74.6% cold 74.6% | after 30s hot 100.0% cold 71.2% | faults during step 3397 (113.2/s)
+run 3: cap 150 MB (call 12.8 ms) immediate hot 79.0% cold 32.2% | after 30s hot 100.0% cold 29.0% | faults during step 3225 (107.5/s)
+run 3: VALID (no external trim detected)
+CSV: <repo>\experiments\results\kernel-probe\A_A2_gentle300_then150_20261113_104613.csv
+== A victim A3_descent0.85: region 400 MB (private), hot 40 MB stride every 100 ms, warmup 30s, caps 340,290,245,210,180,150 MB x 15s, runs 3
+run 1: pre-cap hot 100.0% cold 100.0% resident
+run 1: cap 340 MB (call 10.7 ms) immediate hot 84.7% cold 84.7% | after 15s hot 100.0% cold 82.4% | faults during step 2319 (154.6/s)
+run 1: cap 290 MB (call 4.2 ms) immediate hot 100.0% cold 68.5% | after 15s hot 100.0% cold 67.7% | faults during step 791 (52.7/s)
+run 1: cap 245 MB (call 3.8 ms) immediate hot 97.1% cold 55.6% | after 15s hot 100.0% cold 55.3% | faults during step 315 (21.0/s)
+run 1: cap 210 MB (call 3.3 ms) immediate hot 94.3% cold 46.2% | after 15s hot 100.0% cold 45.5% | faults during step 669 (44.6/s)
+run 1: cap 180 MB (call 2.7 ms) immediate hot 97.2% cold 37.5% | after 15s hot 100.0% cold 37.1% | faults during step 382 (25.5/s)
+run 1: cap 150 MB (call 2.8 ms) immediate hot 95.3% cold 29.3% | after 15s hot 100.0% cold 28.8% | faults during step 509 (33.9/s)
+run 1: VALID (no external trim detected)
+run 2: pre-cap hot 100.0% cold 100.0% resident
+run 2: cap 340 MB (call 10.7 ms) immediate hot 84.7% cold 84.7% | after 15s hot 100.0% cold 82.5% | faults during step 2237 (149.1/s)
+run 2: cap 290 MB (call 4.7 ms) immediate hot 100.0% cold 68.6% | after 15s hot 100.0% cold 67.8% | faults during step 739 (49.3/s)
+run 2: cap 245 MB (call 4.1 ms) immediate hot 94.8% cold 56.0% | after 15s hot 100.0% cold 55.4% | faults during step 593 (39.5/s)
+run 2: cap 210 MB (call 3.1 ms) immediate hot 96.2% cold 46.1% | after 15s hot 100.0% cold 45.6% | faults during step 478 (31.9/s)
+run 2: cap 180 MB (call 2.3 ms) immediate hot 96.2% cold 37.7% | after 15s hot 100.0% cold 37.2% | faults during step 506 (33.7/s)
+run 2: cap 150 MB (call 2.8 ms) immediate hot 95.7% cold 29.4% | after 15s hot 100.0% cold 28.9% | faults during step 468 (31.2/s)
+run 2: VALID (no external trim detected)
+run 3: pre-cap hot 100.0% cold 100.0% resident
+run 3: cap 340 MB (call 10.6 ms) immediate hot 84.4% cold 84.4% | after 15s hot 100.0% cold 82.1% | faults during step 2258 (150.5/s)
+run 3: cap 290 MB (call 4.4 ms) immediate hot 100.0% cold 68.2% | after 15s hot 100.0% cold 67.4% | faults during step 777 (51.8/s)
+run 3: cap 245 MB (call 4.0 ms) immediate hot 96.5% cold 55.3% | after 15s hot 100.0% cold 54.9% | faults during step 382 (25.5/s)
+run 3: cap 210 MB (call 3.1 ms) immediate hot 94.9% cold 45.8% | after 15s hot 100.0% cold 45.2% | faults during step 583 (38.9/s)
+run 3: cap 180 MB (call 2.6 ms) immediate hot 96.8% cold 37.2% | after 15s hot 100.0% cold 36.8% | faults during step 421 (28.1/s)
+run 3: cap 150 MB (call 2.7 ms) immediate hot 95.0% cold 29.0% | after 15s hot 100.0% cold 28.5% | faults during step 543 (36.2/s)
+run 3: VALID (no external trim detected)
+CSV: <repo>\experiments\results\kernel-probe\A_A3_descent0.85_20261113_105052.csv
+== A victim A4_block: region 400 MB (private), hot 40 MB block every 100 ms, warmup 30s, caps 150 MB x 60s, runs 3
+run 1: pre-cap hot 100.0% cold 100.0% resident
+run 1: cap 150 MB (call 26.6 ms) immediate hot 0.0% cold 41.3% | after 60s hot 100.0% cold 29.6% | faults during step 10787 (179.8/s)
+run 1: VALID (no external trim detected)
+run 2: pre-cap hot 100.0% cold 100.0% resident
+run 2: cap 150 MB (call 25.8 ms) immediate hot 0.0% cold 41.4% | after 60s hot 100.0% cold 29.6% | faults during step 10783 (179.7/s)
+run 2: VALID (no external trim detected)
+run 3: pre-cap hot 100.0% cold 100.0% resident
+run 3: cap 150 MB (call 26.4 ms) immediate hot 0.0% cold 41.4% | after 60s hot 100.0% cold 29.6% | faults during step 10809 (180.2/s)
+run 3: VALID (no external trim detected)
+CSV: <repo>\experiments\results\kernel-probe\A_A4_block_20261113_105531.csv
+== A victim A5_file_clean: region 400 MB (file), hot 40 MB stride every 100 ms, warmup 30s, caps 150 MB x 60s, runs 3
+run 1: pre-cap hot 100.0% cold 100.0% resident
+run 1: cap 150 MB (call 24.8 ms) immediate hot 42.5% cold 33.6% | after 60s hot 100.0% cold 27.7% | faults during step 6841 (114.0/s)
+run 1: VALID (no external trim detected)
+run 2: pre-cap hot 100.0% cold 100.0% resident
+run 2: cap 150 MB (call 27.0 ms) immediate hot 39.6% cold 34.5% | after 60s hot 100.0% cold 27.3% | faults during step 7217 (120.3/s)
+run 2: VALID (no external trim detected)
+run 3: pre-cap hot 100.0% cold 100.0% resident
+run 3: cap 150 MB (call 22.8 ms) immediate hot 42.0% cold 33.5% | after 60s hot 100.0% cold 27.7% | faults during step 7752 (129.2/s)
+run 3: VALID (no external trim detected)
+CSV: <repo>\experiments\results\kernel-probe\A_A5_file_clean_20261113_110008.csv
+== A victim A6_hot2s: region 400 MB (private), hot 40 MB stride every 2000 ms, warmup 30s, caps 150 MB x 60s, runs 3
+run 1: pre-cap hot 100.0% cold 100.0% resident
+run 1: cap 150 MB (call 29.7 ms) immediate hot 37.3% cold 37.3% | after 60s hot 100.0% cold 29.0% | faults during step 8372 (139.5/s)
+run 1: VALID (no external trim detected)
+run 2: pre-cap hot 100.0% cold 100.0% resident
+run 2: cap 150 MB (call 22.6 ms) immediate hot 37.3% cold 37.3% | after 60s hot 100.0% cold 29.0% | faults during step 8388 (139.8/s)
+run 2: VALID (no external trim detected)
+run 3: pre-cap hot 100.0% cold 100.0% resident
+run 3: cap 150 MB (call 26.1 ms) immediate hot 37.3% cold 37.3% | after 60s hot 100.0% cold 28.8% | faults during step 8484 (141.4/s)
+run 3: VALID (no external trim detected)
+CSV: <repo>\experiments\results\kernel-probe\A_A6_hot2s_20261113_110451.csv
+== A victim A7_idle300s: region 400 MB (private), hot 40 MB stride every 100 ms, warmup 300s, caps 150 MB x 30s, runs 3
+run 1: pre-cap hot 100.0% cold 100.0% resident
+run 1: cap 150 MB (call 28.1 ms) immediate hot 100.0% cold 29.2% | after 30s hot 100.0% cold 28.7% | faults during step 425 (14.2/s)
+run 1: VALID (no external trim detected)
+run 2: pre-cap hot 100.0% cold 100.0% resident
+run 2: cap 150 MB (call 26.2 ms) immediate hot 100.0% cold 24.0% | after 30s hot 100.0% cold 24.0% | faults during step 0 (0.0/s)
+run 2: VALID (no external trim detected)
+run 3: pre-cap hot 100.0% cold 100.0% resident
+run 3: cap 150 MB (call 23.8 ms) immediate hot 100.0% cold 24.0% | after 30s hot 100.0% cold 24.0% | faults during step 0 (0.0/s)
+run 3: VALID (no external trim detected)
+CSV: <repo>\experiments\results\kernel-probe\A_A7_idle300s_20261113_110928.csv
+t=  0.0 before   modified       9 reserve    456 normal   2985 free   1749 store    389 MB
+t=  0.0 trimmed  modified     265 reserve    456 normal   2985 free   1749 store    389 MB
+t=  1.0 idle     modified      82 reserve    638 normal   2983 free   1691 store    440 MB
+t=  2.1 idle     modified      82 reserve    638 normal   2983 free   1689 store    440 MB
+t=  3.1 idle     modified      82 reserve    638 normal   2983 free   1689 store    440 MB
+t=  4.1 idle     modified      82 reserve    638 normal   2983 free   1687 store    440 MB
+t=  5.1 idle     modified      82 reserve    638 normal   2983 free   1687 store    440 MB
+t= 10.2 idle     modified      82 reserve    636 normal   2992 free   1701 store    440 MB
+t= 15.2 idle     modified      83 reserve    636 normal   2990 free   1768 store    439 MB
+t= 20.3 idle     modified      83 reserve    636 normal   2989 free   1871 store    439 MB
+t= 25.3 idle     modified      83 reserve    633 normal   2989 free   1870 store    438 MB
+t= 30.3 idle     modified      83 reserve    594 normal   2989 free   1839 store    437 MB
+t= 35.4 idle     modified      84 reserve    600 normal   2983 free   1643 store    436 MB
+t= 40.4 idle     modified      85 reserve    598 normal   2985 free   1688 store    436 MB
+t= 45.5 idle     modified      94 reserve    661 normal   2984 free   1693 store    432 MB
+t= 50.5 idle     modified      94 reserve    662 normal   2979 free   1672 store    432 MB
+t= 55.5 idle     modified      97 reserve    662 normal   2982 free   1621 store    432 MB
+t= 60.6 idle     modified     124 reserve    663 normal   2983 free   1453 store    432 MB
+CSV: <repo>\experiments\results\kernel-probe\B_watch_20261113_112605.csv
+t=  0.0 before   modified      33 reserve    489 normal   2982 free    938 store    386 MB
+t=  0.1 trimmed  modified     833 reserve    489 normal   2981 free    946 store    386 MB
+t=  1.1 idle     modified     831 reserve    489 normal   2983 free    953 store    386 MB
+t=  2.1 idle     modified      69 reserve   1241 normal   2982 free    735 store    587 MB
+t=  3.1 idle     modified      70 reserve   1241 normal   2981 free    754 store    587 MB
+t=  4.2 idle     modified      70 reserve   1241 normal   2978 free    796 store    587 MB
+t=  5.2 idle     modified      71 reserve   1241 normal   2980 free    747 store    587 MB
+t= 10.2 idle     modified      70 reserve   1241 normal   2975 free    817 store    587 MB
+t= 15.3 idle     modified      70 reserve   1240 normal   2985 free    810 store    587 MB
+t= 20.3 idle     modified      71 reserve   1240 normal   2982 free    798 store    587 MB
+CSV: <repo>\experiments\results\kernel-probe\B_watch_20261113_112706.csv
+== B faults: small region 128 MB, big region 512 MB, idle wait 30s, pressure margin 512 MB, runs 3; worker memory priority 1
+run 1 S0 resident (never trimmed)                  res 100.0% |   0.06 us/page, >=1us   0.0% | PF      3 HF     0 | sys trans      3 dz   5971 reads     0 pagesIn      0 nonTrans~     0 | store dWS 0.0 MB PF/HF 0/0 Mcyc 0 | worker Mcyc 9
+run 1 S1 demand-zero first write                   res   0.0% |   0.41 us/page, >=1us   6.4% | PF  32833 HF     0 | sys trans      0 dz  39483 reads     0 pagesIn      0 nonTrans~     0 | store dWS 0.0 MB PF/HF 0/0 Mcyc 0 | worker Mcyc 56
+run 1 S2 private trimmed then touched at once      res   0.0% |   0.75 us/page, >=1us   0.4% | PF  32768 HF     0 | sys trans  32768 dz   9808 reads     0 pagesIn      0 nonTrans~     0 | store dWS 0.0 MB PF/HF 0/0 Mcyc 0 | worker Mcyc 103
+run 1 [S3 before trim] modified 2 | standby reserve(p0-3) 509 normal(p4-5) 2980 core(p6-7) 81 | free 1721 | store WS 393 MB
+run 1 [S3 after trim + 30s] modified 82 | standby reserve(p0-3) 677 normal(p4-5) 2984 core(p6-7) 81 | free 1633 | store WS 438 MB
+run 1 S3 private trimmed + 30s idle                res   0.0% |   0.88 us/page, >=1us  13.4% | PF  32775 HF     0 | sys trans  32774 dz  10298 reads     0 pagesIn      0 nonTrans~     0 | store dWS -20.6 MB PF/HF 0/0 Mcyc 109 | worker Mcyc 123
+run 1 [batch before trim] modified 81 | standby reserve(p0-3) 548 normal(p4-5) 2986 core(p6-7) 81 | free 411 | store WS 405 MB
+run 1 [batch just trimmed] modified 1369 | standby reserve(p0-3) 676 normal(p4-5) 2986 core(p6-7) 81 | free 393 | store WS 405 MB
+run 1 [batch trimmed + 15s] modified 71 | standby reserve(p0-3) 1977 normal(p4-5) 2989 core(p6-7) 81 | free 228 | store WS 570 MB
+run 1 S3b private batch-trimmed + 15s, no pressure res   0.0% |   0.94 us/page, >=1us  26.3% | PF  32806 HF     0 | sys trans  32815 dz  14773 reads     0 pagesIn      0 nonTrans~     0 | store dWS 0.0 MB PF/HF 0/0 Mcyc 33 | worker Mcyc 129
+run 1 [after pressure 2674 MB] modified 36 | standby reserve(p0-3) 21 normal(p4-5) 2387 core(p6-7) 81 | free 2750 | store WS 570 MB
+run 1 S4 private trimmed + pressure                res   0.0% |   1.64 us/page, >=1us   8.4% | PF 131074 HF     0 | sys trans 122680 dz  81163 reads     0 pagesIn      0 nonTrans~     0 | store dWS -1.6 MB PF/HF 0/0 Mcyc 184 | worker Mcyc 893
+run 1 S5 file-backed (clean) trimmed + pressure    res   0.0% |   7.14 us/page, >=1us  45.1% | PF  32779 HF  2048 | sys trans  30925 dz  98127 reads  2048 pagesIn  32768 nonTrans~     0 | store dWS 0.0 MB PF/HF 0/0 Mcyc 0 | worker Mcyc 279
+run 1 S6 pagefile section trimmed + pressure       res   0.0% |   2.16 us/page, >=1us  34.9% | PF  32802 HF     0 | sys trans  31151 dz  29952 reads     0 pagesIn      0 nonTrans~     0 | store dWS -0.2 MB PF/HF 0/0 Mcyc 56 | worker Mcyc 295
+run 1 S7 private hard-cap-trimmed + pressure       res   0.0% |   1.95 us/page, >=1us  21.2% | PF 131097 HF     0 | sys trans 122503 dz  94426 reads     0 pagesIn      0 nonTrans~     0 | store dWS -133.6 MB PF/HF 0/0 Mcyc 758 | worker Mcyc 1061
+run 2 S0 resident (never trimmed)                  res 100.0% |   0.06 us/page, >=1us   0.0% | PF      3 HF     0 | sys trans      3 dz   2824 reads     0 pagesIn      0 nonTrans~     0 | store dWS 0.0 MB PF/HF 0/0 Mcyc 0 | worker Mcyc 8
+run 2 S1 demand-zero first write                   res   0.0% |   0.41 us/page, >=1us   6.7% | PF  32832 HF     0 | sys trans      0 dz  46151 reads     0 pagesIn      0 nonTrans~     0 | store dWS 0.0 MB PF/HF 0/0 Mcyc 0 | worker Mcyc 56
+run 2 S2 private trimmed then touched at once      res   0.0% |   1.09 us/page, >=1us  42.6% | PF  32768 HF     0 | sys trans  32777 dz  16927 reads     0 pagesIn      0 nonTrans~     0 | store dWS 0.0 MB PF/HF 0/0 Mcyc 0 | worker Mcyc 150
+run 2 [S3 before trim] modified 26 | standby reserve(p0-3) 0 normal(p4-5) 2386 core(p6-7) 81 | free 2967 | store WS 432 MB
+run 2 [S3 after trim + 30s] modified 150 | standby reserve(p0-3) 3 normal(p4-5) 2386 core(p6-7) 81 | free 2987 | store WS 430 MB
+run 2 S3 private trimmed + 30s idle                res   0.0% |   0.81 us/page, >=1us   8.5% | PF  32768 HF     0 | sys trans  32769 dz    307 reads     0 pagesIn      0 nonTrans~     0 | store dWS 0.0 MB PF/HF 0/0 Mcyc 0 | worker Mcyc 112
+run 2 [batch before trim] modified 22 | standby reserve(p0-3) 3 normal(p4-5) 2385 core(p6-7) 81 | free 1721 | store WS 430 MB
+run 2 [batch just trimmed] modified 1311 | standby reserve(p0-3) 131 normal(p4-5) 2386 core(p6-7) 81 | free 1716 | store WS 430 MB
+run 2 [batch trimmed + 15s] modified 66 | standby reserve(p0-3) 1377 normal(p4-5) 2390 core(p6-7) 81 | free 1563 | store WS 570 MB
+run 2 S3b private batch-trimmed + 15s, no pressure res   0.0% |   0.82 us/page, >=1us   4.2% | PF  32780 HF     0 | sys trans  32845 dz    416 reads     0 pagesIn      0 nonTrans~     0 | store dWS 0.0 MB PF/HF 0/0 Mcyc 31 | worker Mcyc 113
+run 2 [after pressure 3391 MB] modified 26 | standby reserve(p0-3) 56 normal(p4-5) 1814 core(p6-7) 81 | free 3417 | store WS 573 MB
+run 2 S4 private trimmed + pressure                res   0.0% |   1.57 us/page, >=1us   7.1% | PF 131072 HF     0 | sys trans 122758 dz   2901 reads     1 pagesIn      7 nonTrans~  5413 | store dWS -2.1 MB PF/HF 1/1 Mcyc 183 | worker Mcyc 846
+run 2 S5 file-backed (clean) trimmed + pressure    res   0.0% |   7.21 us/page, >=1us  24.2% | PF  32775 HF  2048 | sys trans  36383 dz   1205 reads  2048 pagesIn  32768 nonTrans~     0 | store dWS -0.2 MB PF/HF 0/0 Mcyc 0 | worker Mcyc 245
+run 2 S6 pagefile section trimmed + pressure       res   0.0% |   1.69 us/page, >=1us   7.5% | PF  32768 HF     0 | sys trans  30672 dz    317 reads     0 pagesIn      0 nonTrans~  1779 | store dWS -0.1 MB PF/HF 0/0 Mcyc 57 | worker Mcyc 227
+run 2 S7 private hard-cap-trimmed + pressure       res   0.0% |   1.72 us/page, >=1us  22.1% | PF 131162 HF     0 | sys trans 123070 dz    371 reads     0 pagesIn      0 nonTrans~  7721 | store dWS -133.4 MB PF/HF 0/0 Mcyc 660 | worker Mcyc 942
+run 3 S0 resident (never trimmed)                  res 100.0% |   0.06 us/page, >=1us   0.0% | PF      2 HF     0 | sys trans      2 dz    304 reads     0 pagesIn      0 nonTrans~     0 | store dWS 0.0 MB PF/HF 0/0 Mcyc 0 | worker Mcyc 8
+run 3 S1 demand-zero first write                   res   0.0% |   0.41 us/page, >=1us   6.8% | PF  32832 HF     0 | sys trans      0 dz  36176 reads     0 pagesIn      0 nonTrans~     0 | store dWS 0.0 MB PF/HF 0/0 Mcyc 0 | worker Mcyc 56
+run 3 S2 private trimmed then touched at once      res   0.0% |   0.79 us/page, >=1us   4.3% | PF  32768 HF     0 | sys trans  32789 dz    305 reads     0 pagesIn      0 nonTrans~     0 | store dWS 0.0 MB PF/HF 0/0 Mcyc 0 | worker Mcyc 108
+run 3 [S3 before trim] modified 22 | standby reserve(p0-3) 1 normal(p4-5) 1813 core(p6-7) 81 | free 3645 | store WS 436 MB
+run 3 [S3 after trim + 30s] modified 145 | standby reserve(p0-3) 22 normal(p4-5) 1814 core(p6-7) 81 | free 3719 | store WS 435 MB
+run 3 S3 private trimmed + 30s idle                res   0.0% |   0.79 us/page, >=1us   4.0% | PF  32768 HF     0 | sys trans  32843 dz    678 reads     0 pagesIn      0 nonTrans~     0 | store dWS 0.0 MB PF/HF 0/0 Mcyc 0 | worker Mcyc 108
+run 3 [batch before trim] modified 17 | standby reserve(p0-3) 22 normal(p4-5) 1815 core(p6-7) 81 | free 2455 | store WS 435 MB
+run 3 [batch just trimmed] modified 1305 | standby reserve(p0-3) 150 normal(p4-5) 1815 core(p6-7) 81 | free 2448 | store WS 435 MB
+run 3 [batch trimmed + 15s] modified 89 | standby reserve(p0-3) 1385 normal(p4-5) 1816 core(p6-7) 81 | free 1999 | store WS 577 MB
+run 3 S3b private batch-trimmed + 15s, no pressure res   0.0% |   0.85 us/page, >=1us   9.3% | PF  32798 HF     0 | sys trans  33547 dz    690 reads    20 pagesIn     20 nonTrans~     0 | store dWS 0.0 MB PF/HF 0/0 Mcyc 32 | worker Mcyc 117
+run 3 [after pressure 3615 MB] modified 51 | standby reserve(p0-3) 115 normal(p4-5) 1637 core(p6-7) 88 | free 3604 | store WS 88 MB
+run 3 S4 private trimmed + pressure                res   0.0% |   1.74 us/page, >=1us   7.1% | PF 131085 HF     0 | sys trans 156411 dz    896 reads    18 pagesIn    219 nonTrans~     0 | store dWS 128.8 MB PF/HF 32969/18 Mcyc 170 | worker Mcyc 935
+run 3 S5 file-backed (clean) trimmed + pressure    res   0.0% |   6.16 us/page, >=1us  21.9% | PF  32774 HF  2048 | sys trans  30803 dz    670 reads  2048 pagesIn  32768 nonTrans~  1301 | store dWS 0.0 MB PF/HF 2/0 Mcyc 0 | worker Mcyc 234
+run 3 S6 pagefile section trimmed + pressure       res   0.0% |   1.63 us/page, >=1us   7.6% | PF  32768 HF     0 | sys trans  30720 dz    549 reads     0 pagesIn      0 nonTrans~  1499 | store dWS 0.0 MB PF/HF 0/0 Mcyc 54 | worker Mcyc 221
+run 3 S7 private hard-cap-trimmed + pressure       res   0.0% |   1.61 us/page, >=1us   8.0% | PF 131079 HF     0 | sys trans 122078 dz   1178 reads     0 pagesIn      0 nonTrans~  7823 | store dWS -135.1 MB PF/HF 1/0 Mcyc 715 | worker Mcyc 865
+CSV: <repo>\experiments\results\kernel-probe\B_faults_20261113_112727.csv
+== A victim A9_block_fwdfill: region 400 MB (private, fill forward), hot 40 MB block every 100 ms, warmup 30s, caps 150 MB x 30s, runs 3
+run 1: pre-cap hot 100.0% cold 100.0% resident
+run 1: cap 150 MB (call 26.4 ms) immediate hot 0.0% cold 41.4% | after 30s hot 100.0% cold 29.7% | faults during step 10698 (356.6/s)
+run 1: VALID (no external trim detected)
+run 2: pre-cap hot 100.0% cold 100.0% resident
+run 2: cap 150 MB (call 25.7 ms) immediate hot 0.0% cold 41.4% | after 30s hot 100.0% cold 29.6% | faults during step 10806 (360.2/s)
+run 2: VALID (no external trim detected)
+run 3: pre-cap hot 100.0% cold 100.0% resident
+run 3: cap 150 MB (call 26.0 ms) immediate hot 0.0% cold 41.4% | after 30s hot 100.0% cold 29.7% | faults during step 10720 (357.3/s)
+run 3: VALID (no external trim detected)
+CSV: <repo>\experiments\results\kernel-probe\A_A9_block_fwdfill_20261113_113015.csv
+== A victim A10_block_revfill: region 400 MB (private, fill reverse), hot 40 MB block every 100 ms, warmup 30s, caps 150 MB x 30s, runs 3
+run 1: pre-cap hot 100.0% cold 100.0% resident
+run 1: cap 150 MB (call 26.6 ms) immediate hot 0.3% cold 39.5% | after 30s hot 100.0% cold 28.0% | faults during step 10524 (350.8/s)
+run 1: VALID (no external trim detected)
+run 2: pre-cap hot 100.0% cold 100.0% resident
+run 2: cap 150 MB (call 26.6 ms) immediate hot 0.0% cold 39.5% | after 30s hot 100.0% cold 28.1% | faults during step 10493 (349.8/s)
+run 2: VALID (no external trim detected)
+run 3: pre-cap hot 100.0% cold 100.0% resident
+run 3: cap 150 MB (call 26.1 ms) immediate hot 0.3% cold 39.5% | after 30s hot 100.0% cold 28.0% | faults during step 10537 (351.2/s)
+run 3: VALID (no external trim detected)
+CSV: <repo>\experiments\results\kernel-probe\A_A10_block_revfill_20261113_113322.csv
+== A victim A8_prime415_then150: region 400 MB (private, fill forward), hot 40 MB stride every 100 ms, warmup 30s, caps 415,150 MB x 15s, runs 3
+run 1: pre-cap hot 100.0% cold 100.0% resident
+run 1: cap 415 MB (call 1.1 ms) immediate hot 100.0% cold 98.0% | after 15s hot 100.0% cold 98.0% | faults during step 2 (0.1/s)
+run 1: cap 150 MB (call 25.1 ms) immediate hot 38.2% cold 37.2% | after 15s hot 100.0% cold 28.9% | faults during step 8431 (562.1/s)
+run 1: VALID (no external trim detected)
+run 2: pre-cap hot 100.0% cold 100.0% resident
+run 2: cap 415 MB (call 0.8 ms) immediate hot 100.0% cold 98.0% | after 15s hot 100.0% cold 97.9% | faults during step 2 (0.1/s)
+run 2: cap 150 MB (call 25.0 ms) immediate hot 38.2% cold 37.2% | after 15s hot 100.0% cold 28.9% | faults during step 8434 (562.3/s)
+run 2: VALID (no external trim detected)
+run 3: pre-cap hot 100.0% cold 100.0% resident
+run 3: cap 415 MB (call 0.8 ms) immediate hot 100.0% cold 97.8% | after 15s hot 100.0% cold 97.8% | faults during step 0 (0.0/s)
+run 3: cap 150 MB (call 25.0 ms) immediate hot 37.7% cold 37.2% | after 15s hot 100.0% cold 28.9% | faults during step 8476 (565.1/s)
+run 3: VALID (no external trim detected)
+CSV: <repo>\experiments\results\kernel-probe\A_A8_prime415_then150_20261113_113629.csv
+== A victim A7a_idle60s: region 400 MB (private, fill forward), hot 40 MB stride every 100 ms, warmup 60s, caps 150 MB x 30s, runs 3
+run 1: pre-cap hot 100.0% cold 100.0% resident
+run 1: cap 150 MB (call 25.7 ms) immediate hot 37.2% cold 37.2% | after 30s hot 100.0% cold 29.6% | faults during step 7696 (256.5/s)
+run 1: VALID (no external trim detected)
+run 2: pre-cap hot 100.0% cold 100.0% resident
+run 2: cap 150 MB (call 25.7 ms) immediate hot 37.2% cold 37.3% | after 30s hot 100.0% cold 29.7% | faults during step 7631 (254.4/s)
+run 2: VALID (no external trim detected)
+run 3: pre-cap hot 100.0% cold 100.0% resident
+run 3: cap 150 MB (call 25.7 ms) immediate hot 37.2% cold 37.2% | after 30s hot 100.0% cold 29.6% | faults during step 7716 (257.2/s)
+run 3: VALID (no external trim detected)
+CSV: <repo>\experiments\results\kernel-probe\A_A7a_idle60s_20261113_113906.csv
+== A victim A7b_idle120s: region 400 MB (private, fill forward), hot 40 MB stride every 100 ms, warmup 120s, caps 150 MB x 30s, runs 3
+run 1: pre-cap hot 100.0% cold 100.0% resident
+run 1: cap 150 MB (call 26.1 ms) immediate hot 37.3% cold 37.3% | after 30s hot 100.0% cold 29.9% | faults during step 7738 (257.9/s)
+run 1: VALID (no external trim detected)
+run 2: pre-cap hot 100.0% cold 100.0% resident
+run 2: cap 150 MB (call 25.8 ms) immediate hot 37.2% cold 37.3% | after 30s hot 100.0% cold 29.7% | faults during step 7715 (257.2/s)
+run 2: VALID (no external trim detected)
+run 3: pre-cap hot 100.0% cold 100.0% resident
+run 3: cap 150 MB (call 25.6 ms) immediate hot 37.2% cold 37.2% | after 30s hot 100.0% cold 29.6% | faults during step 7718 (257.3/s)
+run 3: VALID (no external trim detected)
+CSV: <repo>\experiments\results\kernel-probe\A_A7b_idle120s_20261113_114343.csv
+== A victim A7r_idle300s_repeat: region 400 MB (private, fill forward), hot 40 MB stride every 100 ms, warmup 300s, caps 150 MB x 30s, runs 3
+run 1: pre-cap hot 100.0% cold 100.0% resident
+run 1: cap 150 MB (call 23.8 ms) immediate hot 100.0% cold 24.3% | after 30s hot 100.0% cold 24.3% | faults during step 3 (0.1/s)
+run 1: VALID (no external trim detected)
+run 2: pre-cap hot 100.0% cold 100.0% resident
+run 2: cap 150 MB (call 22.2 ms) immediate hot 73.5% cold 33.0% | after 30s hot 100.0% cold 29.7% | faults during step 4429 (147.6/s)
+run 2: VALID (no external trim detected)
+run 3: pre-cap hot 100.0% cold 100.0% resident
+run 3: cap 150 MB (call 21.7 ms) immediate hot 100.0% cold 24.3% | after 30s hot 100.0% cold 24.3% | faults during step 1 (0.0/s)
+run 3: VALID (no external trim detected)
+CSV: <repo>\experiments\results\kernel-probe\A_A7r_idle300s_repeat_20261113_115136.csv
