@@ -31,10 +31,10 @@ jobs:
 
     steps:
       - name: Check out
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 10.0.x
 
@@ -75,7 +75,7 @@ jobs:
           "RamPilot.exe: $sizeMb MB (budget $budget MB)"
 
       - name: Upload build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: RamPilot-win-x64-${{ github.sha }}
           path: artifacts/out/RamPilot
@@ -83,7 +83,7 @@ jobs:
           retention-days: 14
 
       - name: Upload symbols
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: RamPilot-win-x64-symbols-${{ github.sha }}
           path: artifacts/symbols
@@ -92,7 +92,7 @@ jobs:
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-results-${{ github.sha }}
           path: artifacts/test-results
